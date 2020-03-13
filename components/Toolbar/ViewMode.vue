@@ -13,7 +13,7 @@
 
       function render() {
         return context.slots.default &&
-            context.slots.default({onViewModeUpdated})
+            context.slots.default({onViewModeUpdated, selectedViewMode: props.selectedViewMode})
             || <g-item-group class="view-mode">
               {viewModes.map(mode => {
                 return (

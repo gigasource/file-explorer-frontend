@@ -20,6 +20,7 @@
         type: String,
         default: '->',
       },
+      folderTree: Array,
     },
     setup(props, context) {
       // slot name for children components
@@ -46,7 +47,7 @@
       const viewMode = ref('grid')
       const fileFilter = ref(null)
       const fileGroup = ref(null)
-      const fileSort = ref('old')
+      const fileSort = ref('az')
 
       const sort = ref({
         type: 'name',
@@ -76,40 +77,8 @@
 
         let tempFiles = _.cloneDeep(files)
 
-        // if (path) tempFiles = getFilesByPath(files, path)
-        // if (searchText) tempFiles = tempFiles.filter(file => file.fileName.toLowerCase().includes(searchText.trim().toLowerCase()))
-
-        // const filesWithMediaType = tempFiles.map(file => {
-        //   const type = file.isFolder ? 'folder' : file.mimeType.split('/')[0]
-        //
-        //   return {
-        //     ...file,
-        //     type
-        //   }
-        // })
-        //
-        // if (filter && filter !== 'none') {
-        //   tempFiles = tempFiles.filter(file => {
-        //     return filesWithMediaType.filter(f => f.type === filter).includes(i => i._id === file._id)
-        //   })
-        // }
-        //
-        // if (group) {
-        //   tempFiles = _.groupBy(filesWithMediaType, 'type')
-        // }
-
-        // if (sort) {
-        //   if (group) {
-        //     for (const fileGroup in tempFiles) {
-        //       if (tempFiles.hasOwnProperty(fileGroup)) _.set(tempFiles, fileGroup, sortFiles(sort, tempFiles[fileGroup]))
-        //     }
-        //   } else {
-        //     tempFiles = sortFiles(sort, tempFiles)
-        //   }
-        // }
-
         if (sort) tempFiles = sortFiles(sort, tempFiles)
-        if (searchText) tempFiles = tempFiles.filter(file => file.fileName.includes(searchText))
+        if (searchText) tempFiles = tempFiles.filter(file => file.fileName.toLocaleLowerCase().includes(searchText.toLowerCase()))
 
         return tempFiles
       }
@@ -173,7 +142,6 @@
                 'up': () => {
                   let newPath = props.path.split('/')
                   newPath.pop()
-                  newPath.pop()
                   newPath = newPath.join('/')
                   if (!newPath.startsWith('/')) newPath = '/' + newPath
                   context.emit('update:path', newPath)
@@ -203,7 +171,7 @@
         return <address-bar {...elementData}/>
       }
 
-      function renderFileExplorer() {
+      function renderFileExplorerPanel() {
         const elementData = {
           scopedSlots: {
             [fileExplorerPanelSlots.contextMenu]: context.slots[fileExplorerPanelSlots.contextMenu],
@@ -237,7 +205,12 @@
 
         const elementData = {
           props: {
-            folders
+            folders,
+            folderTree: props.folderTree,
+            path: props.path,
+          },
+          on: {
+            folderSelected: folderPath => context.emit('update:path', folderPath)
           }
         }
 
@@ -261,7 +234,7 @@
       const render = () => {
         const toolbarVNode = renderToolbar()
         const addressBarVNode = renderAddressBar()
-        const fileExplorerVNode = renderFileExplorer()
+        const fileExplorerVNode = renderFileExplorerPanel()
         const folderTreeVNode = renderFolderTree()
 
         return (context.slots.components

@@ -23,7 +23,10 @@
 
       function render() {
         return context.slots.default &&
-            context.slots.default({[`on${capitalize(props.optionType)}Selected`]: onOptionSelected})
+            context.slots.default({
+              [`on${capitalize(props.optionType)}Selected`]: onOptionSelected,
+              [`selected${capitalize(props.optionType)}`]: props.selectedOption,
+            })
             || <g-menu
                 {...{
                   props: {
