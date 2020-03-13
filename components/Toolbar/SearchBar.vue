@@ -18,7 +18,7 @@
             </div>
         );
 
-        return (context.slots.default && context.slots.default({onSearchInput}))
+        return (context.slots.default && context.slots.default({onSearchInput, searchText: props.searchText, placeholder: props.placeholder}))
             || fallbackContent
       };
 
