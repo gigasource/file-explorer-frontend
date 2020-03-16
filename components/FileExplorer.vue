@@ -1,11 +1,12 @@
 <script>
   import _ from 'lodash'
   import {ref, watch} from '@vue/composition-api'
-  import Toolbar from './Toolbar/Toolbar';
-  import AddressBar from './AddressBar/AddressBar';
-  import FileExplorerPanel from './FileExplorerPanel/FileExplorerPanel';
-  import {Fragment} from 'vue-fragment';
-  import FolderTree from "./FolderTree/FolderTree";
+  import Toolbar from './Toolbar/Toolbar'
+  import AddressBar from './AddressBar/AddressBar'
+  import FileExplorerPanel from './FileExplorerPanel/FileExplorerPanel'
+  import {Fragment} from 'vue-fragment'
+  import FolderTree from './FolderTree/FolderTree'
+  import {folderArrayToFolderParth, folderPathToFolderArray} from '../utils/file-path'
 
   export default {
     name: 'FileExplorer',
@@ -60,8 +61,9 @@
 
       function openFile(file) {
         if (file.isFolder) {
-          let folderPath = `${file.folderPath}${file.fileName}`
-          if (!folderPath.endsWith('/')) folderPath += '/'
+          const folderArray = folderPathToFolderArray(file.folderPath)
+          folderArray.push(file.fileName)
+          const folderPath = folderArrayToFolderParth(folderArray)
 
           return context.emit('update:path', folderPath)
         }
@@ -140,10 +142,10 @@
                 'onNewFile': openUploadFileDialog,
                 'newFolder': () => context.emit('newFolder'),
                 'up': () => {
-                  let newPath = props.path.split('/')
-                  newPath.pop()
-                  newPath = newPath.join('/')
-                  if (!newPath.startsWith('/')) newPath = '/' + newPath
+                  const folderArray = folderPathToFolderArray(props.path)
+                  folderArray.pop()
+                  const newPath = folderArrayToFolderParth(folderArray)
+
                   context.emit('update:path', newPath)
                 },
 
@@ -210,7 +212,10 @@
             path: props.path,
           },
           on: {
-            folderSelected: folderPath => context.emit('update:path', folderPath)
+            folderSelected: folderPath => {
+              if (!folderPath.endsWith('/')) folderPath += '/'
+              context.emit('update:path', folderPath)
+            }
           }
         }
 

@@ -1,5 +1,6 @@
 <script>
   import {ref, computed, onMounted} from '@vue/composition-api'
+  import {folderArrayToFolderParth, folderPathToFolderArray} from '../../utils/file-path'
 
   export default {
     name: "FolderTree",
@@ -45,8 +46,11 @@
         return makeTreeClickable(props.folderTree)
       })
 
-      function onFolderSelected(folderObject, path) {
-        context.emit('folderSelected', `${folderObject.folderPath || ''}${folderObject.folderName || ''}`);
+      function onFolderSelected(folderObject) {
+        const folderArray = folderPathToFolderArray(folderObject.folderPath || '')
+        if (folderObject.folderName) folderArray.push(folderObject.folderName)
+
+        context.emit('folderSelected', folderArrayToFolderParth(folderArray));
       }
 
       function nodeIcon(node) {

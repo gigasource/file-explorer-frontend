@@ -131,7 +131,7 @@
         }}/>
       }
 
-      const renderBackButton = () => {
+      const renderUpButton = () => {
         return <action-button {...{
           props: {
             actionText: 'Up',
@@ -166,7 +166,7 @@
 
       const renderToolbar = () => {
         return <div class="toolbar">
-          {renderBackButton()}
+          {renderUpButton()}
           {renderViewMode()}
           {renderFileSort()}
           <g-spacer/>
