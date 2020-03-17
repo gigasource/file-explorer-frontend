@@ -6,7 +6,7 @@
     name: 'File',
     components: {ContextMenu},
     props: {
-      file: null,
+      file: Object,
       selected: {
         type: Boolean,
         default: false,
@@ -22,16 +22,18 @@
     },
     setup(props, context) {
       const isEditingName = ref(false)
-      const showContextMenu = ref(false)
 
       function renderFileIcon() {
-        let icon = 'fas fa-file';
+        if (props.file.mimeType && props.file.mimeType.startsWith('image') && props.file.viewUrl) {
+          return <img class="file-thumbnail" src={props.file.viewUrl}/>
+        } else {
+          let icon = 'fas fa-file';
 
-        if (props.file.isFolder) icon = 'fas fa-folder';
-        else if (props.mimeType === 'video') icon = 'fas fa-film';
-        else if (props.mimeType === 'image') icon = 'fas fa-file-image';
+          if (props.file.isFolder) icon = 'fas fa-folder';
+          else if (props.file.mimeType && props.file.mimeType.startsWith('video')) icon = 'fas fa-film';
 
-        return <g-icon class="file-icon" color="blue" xLarge>{icon}</g-icon>
+          return <g-icon class="file-icon" color="blue">{icon}</g-icon>
+        }
       }
 
       function renderFileName() {
@@ -121,6 +123,7 @@
       padding: 4px;
 
       .file-name {
+        word-break: break-all;
         display: flex;
         justify-content: center;
         padding: 0 4px;
@@ -131,6 +134,7 @@
       padding: 8px;
 
       .file-name {
+        word-break: break-all;
         padding-left: 6px;
       }
     }
@@ -166,10 +170,13 @@
     }
   }
 
-  .grid-item {
-
-  }
-
-  .list-item {
+  .file--grid {
+    .file-thumbnail {
+      width: 60px;
+      height: 60px;
+    }
+    .file-icon {
+      font-size: 60px !important;
+    }
   }
 </style>

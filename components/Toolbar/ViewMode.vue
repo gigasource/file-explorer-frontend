@@ -19,6 +19,7 @@
                 return (
                     <g-btn {...{
                       class: {
+                        'view-mode--selection': true,
                         [`view-mode--${mode}`]: true,
                         'view-mode--selected': props.selectedViewMode === mode,
                       },
@@ -49,11 +50,21 @@
 
 <style lang="scss" scoped>
   .view-mode {
+    height: 80% !important;
     display: flex;
     cursor: pointer;
+    align-items: center;
+
+    &--selection {
+      height: 100% !important;
+      background-color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
     &--selected {
-      background-color: #90caf9 !important;
+      background-color: #616161 !important;
     }
   }
 </style>

@@ -24,6 +24,7 @@
       folderTree: Array,
     },
     setup(props, context) {
+      const fileInClipboard = ref(null)
       // slot name for children components
       const toolbarSlots = {
         viewModeSelection: 'view-mode-selection',
@@ -133,15 +134,16 @@
                 group: group.value,
                 searchText: searchText.value,
                 slotNames: toolbarSlots,
+                addressBarDivider: props.addressBarDivider,
               },
               on: {
                 'update:viewMode': mode => viewMode.value = mode,
                 'update:filter': filter => fileFilter.value = filter,
                 'update:group': group => fileGroup.value = group,
                 'update:sort': sort => fileSort.value = sort,
-                'onNewFile': openUploadFileDialog,
-                'newFolder': () => context.emit('newFolder'),
-                'up': () => {
+                newFile: openUploadFileDialog,
+                newFolder: () => context.emit('newFolder'),
+                up: () => {
                   const folderArray = folderPathToFolderArray(props.path)
                   folderArray.pop()
                   const newPath = folderArrayToFolderParth(folderArray)
@@ -150,13 +152,15 @@
                 },
 
                 'update:display': e => display.value = e,
-                'update:searchText': e => searchText.value = e
+                'update:searchText': e => searchText.value = e,
+                'update:path': path => context.emit('update:path', path)
               }
             }}/>
         )
       }
 
-      function renderAddressBar() {
+      /** kept for future use if needed
+       function renderAddressBar() {
         const elementData = {
           scopedSlots: {
             default: context.slots[addressBarSlots.addressBar],
@@ -172,6 +176,7 @@
 
         return <address-bar {...elementData}/>
       }
+       */
 
       function renderFileExplorerPanel() {
         const elementData = {
@@ -186,16 +191,20 @@
             slotNames: fileExplorerPanelSlots,
             appendContextOptions: props.appendContextOptions,
             viewMode: viewMode.value,
+            fileInClipboard: fileInClipboard.value
           },
           on: {
-            openFile: file => {
+            'update:fileInClipboard': file => fileInClipboard.value = file,
+            open: file => {
               openFile(file)
-              context.emit('openFile', file)
+              context.emit('open', file)
             },
-            cutFile: file => context.emit('cutFile', file),
-            pasteFile: file => context.emit('pasteFile', file),
-            deleteFile: file => context.emit('deleteFile', file),
-            renameFile: file => context.emit('renameFile', file),
+            cut: file => context.emit('cut', file),
+            paste: file => context.emit('paste', file),
+            delete: file => context.emit('delete', file),
+            rename: file => context.emit('rename', file),
+            newFile: openUploadFileDialog,
+            newFolder: () => context.emit('newFolder'),
           }
         }
 
@@ -238,21 +247,19 @@
 
       const render = () => {
         const toolbarVNode = renderToolbar()
-        const addressBarVNode = renderAddressBar()
         const fileExplorerVNode = renderFileExplorerPanel()
         const folderTreeVNode = renderFolderTree()
 
         return (context.slots.components
             && (
                 <fragment>
-                  {context.slots.components({toolbarVNode, addressBarVNode, fileExplorerVNode, folderTreeVNode})}
+                  {context.slots.components({toolbarVNode, fileExplorerVNode, folderTreeVNode})}
                 </fragment>
             ))
             //fallback content
             || (
-                <div class="elevation-3 file-explorer-panel">
+                <div class="elevation-3 file-explorer">
                   {toolbarVNode}
-                  {addressBarVNode}
                   {fileExplorerVNode}
                 </div>
             )

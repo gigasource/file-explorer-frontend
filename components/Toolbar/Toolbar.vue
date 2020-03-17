@@ -5,9 +5,10 @@
   import ViewOption from "./ViewOption";
   import {Fragment} from 'vue-fragment';
   import ActionButton from "./ActionButton";
+  import AddressBar from "../AddressBar/AddressBar";
 
   export default {
-    components: {ActionButton, ViewOption, ViewMode, SearchBar, Fragment},
+    components: {AddressBar, ActionButton, ViewOption, ViewMode, SearchBar, Fragment},
     props: {
       selectedViewMode: String,
       selectedFilter: String,
@@ -15,6 +16,10 @@
       selectedSort: String,
       slotNames: Object,
       path: String,
+      addressBarDivider: {
+        type: String,
+        default: '->',
+      },
     },
     name: 'Toolbar',
     setup(props, context) {
@@ -57,12 +62,13 @@
       const renderFileSort = () => {
         return <view-option {...{
           props: {
+            prependText: 'Sort: ',
             selectedOption: props.selectedSort,
             options: [
-              {text: 'Older first', value: 'old'},
-              {text: 'Newer first', value: 'new'},
               {text: 'A-Z', value: 'az'},
               {text: 'Z-A', value: 'za'},
+              {text: 'Newer', value: 'new'},
+              {text: 'Older', value: 'old'},
             ],
             optionIcon: 'fas fa-sort',
             optionType: 'sort',
@@ -104,7 +110,8 @@
 
         return <search-bar {...{
           props: {
-            value: props.searchText
+            value: props.searchText,
+            placeholder: 'Search',
           },
           on: {
             input: onInput
@@ -118,12 +125,12 @@
       const renderNewFileButton = () => {
         return <action-button {...{
           props: {
-            actionText: 'New File',
-            actionIcon: 'fas fa-plus',
+            actionText: 'Upload File',
+            actionIcon: 'fas fa-cloud-upload-alt',
             actionName: 'newFile',
           },
           on: {
-            onNewFile: () => context.emit('onNewFile')
+            newFile: () => context.emit('newFile')
           },
           scopedSlots: {
             default: context.slots[props.slotNames.btnNewFile]
@@ -140,7 +147,7 @@
             disabled: props.path === '/',
           },
           on: {
-            onUp: () => context.emit('up')
+            up: () => context.emit('up')
           },
           scopedSlots: {
             default: context.slots[props.slotNames.btnBack]
@@ -156,7 +163,7 @@
             actionName: 'newFolder',
           },
           on: {
-            onNewFolder: () => context.emit('newFolder')
+            newFolder: () => context.emit('newFolder')
           },
           scopedSlots: {
             default: context.slots[props.slotNames.btnNewFolder]
@@ -164,15 +171,36 @@
         }}/>
       }
 
+      function renderAddressBar() {
+        const elementData = {
+          class: {
+            'ml-2': true,
+          },
+          props: {
+            path: props.path,
+            divider: props.addressBarDivider,
+          },
+          on: {
+            updatePath: path => context.emit('update:path', path),
+          },
+          scopedSlots: {
+            default: context.slots[props.slotNames.addressBar],
+          },
+        }
+
+        return <address-bar {...elementData}/>
+      }
+
       const renderToolbar = () => {
-        return <div class="toolbar">
+        return <div class="file-explorer__toolbar">
           {renderUpButton()}
           {renderViewMode()}
           {renderFileSort()}
-          <g-spacer/>
-          {renderNewFileButton()}
-          {renderNewFolderButton()}
+          {renderAddressBar()}
+
           {renderSearchBar()}
+          {renderNewFolderButton()}
+          {renderNewFileButton()}
         </div>
       }
 
@@ -187,14 +215,16 @@
 </script>
 
 <style scoped lang="scss">
-  .toolbar {
-    display: flex;
-    height: 50px;
-    justify-content: space-between;
-    padding: 5px 6px 5px 10px;
-    align-items: center;
-    background-color: #E0E0E0;
-    user-select: none;
+  .file-explorer {
+    &__toolbar {
+      display: flex;
+      height: 50px;
+      justify-content: space-between;
+      padding: 5px 10px;
+      align-items: center;
+      background-color: #E0E0E0;
+      user-select: none;
+    }
   }
 
   .search-text {

@@ -12,7 +12,7 @@
 
       const renderSearchField = function () {
         const fallbackContent = (
-            <div class="search row-flex align-items-center br-2 pa-1">
+            <div class="search row-flex align-items-center br-2 pa-1 elevation-2">
               <g-text-field type="text" prependIcon="search"
                             value={props.searchText} vOn:input={onSearchInput} placeholder={props.placeholder}/>
             </div>
@@ -34,9 +34,10 @@
 
 <style lang="scss" scoped>
   .search {
-    border: 1px solid #D7D7D7;
+    padding: 0 4px !important;
+    height: 80%;
     background-color: #FFFFFF;
-    margin-left: 4px;
+    margin-left: 8px;
 
     .g-tf-wrapper {
       margin: 0;

@@ -2,74 +2,91 @@
   import {ref} from '@vue/composition-api'
   import File from './File'
   import ContextMenu from "./ContextMenu"
-  import {Fragment} from 'vue-fragment'
+  import FileViewerDialog from "./FileViewerDialog";
 
   export default {
     name: 'FileExplorerPanel',
-    components: {File, ContextMenu, Fragment},
+    components: {FileViewerDialog, File, ContextMenu},
     props: {
       files: [Array, Object],
       path: String,
       slotNames: Object,
       appendContextOptions: Array,
       viewMode: String,
+      fileInClipboard: Object,
     },
     setup(props, context) {
-      const selectedFile = ref(null);
-      const openingContextMenu = ref(null); // the file that has an opening context menu
+      const selectedFile = ref(null)
+      const showContextMenu = ref(false)
+      const showFileViewerDialog = ref(false)
 
-      function renderFileContainer(files) {
-        const elementData = {
-          class: {
-            'file-container': true,
-            'file-container--grid': props.viewMode === 'grid',
-            'file-container--list': props.viewMode === 'list',
+      function renderFileContainer() {
+        const menuData = {
+          props: {
+            value: showContextMenu.value,
+            closeOnContentClick: true,
+            absolute: true,
+            contentFillWidth: false,
           },
+          scopedSlots: {
+            activator: ({toggleContent: toggleContextMenu}) => {
+              const containerData = {
+                class: {
+                  'file-container': true,
+                  'file-container--grid': props.viewMode === 'grid',
+                  'file-container--list': props.viewMode === 'list',
+                },
+              }
+
+              const contextMenuListener = {
+                on: {
+                  contextmenu(e) {
+                    e.preventDefault()
+                    toggleContextMenu(e)
+                    selectedFile.value = null
+                  },
+                }
+              }
+
+              if (Array.isArray(props.files) && props.files.length > 0) {
+                return (
+                    <div class="fill-height" {...contextMenuListener}>
+                      <div {...containerData}>
+                        {props.files.map(f => {
+                          return <div>
+                            {renderFile(f, toggleContextMenu)}
+                          </div>
+                        })}
+                      </div>
+                    </div>
+                )
+              } else {
+                return (
+                    <div class="fill-height" {...contextMenuListener}>
+                      <div {...containerData}>
+                        <g-icon class="empty-folder__icon" color="#bdbdbd" xLarge>far fa-folder-open</g-icon>
+                        <span class="empty-folder-message">Empty folder</span>
+                      </div>
+                    </div>
+                )
+              }
+            },
+            default: () => {
+              return renderContextMenu(selectedFile.value)
+            }
+          }
         }
 
-        if (Array.isArray(files) && files.length > 0) {
-          return (
-              <div {...elementData}>
-                {files.map(f => {
-                  const menuData = {
-                    props: {
-                      value: openingContextMenu.value === f,
-                      closeOnContentClick: true,
-                      absolute: true,
-                      contentFillWidth: false,
-                    },
-                    scopedSlots: {
-                      activator: ({toggleContent}) => {
-                        return (
-                            <div>
-                              {renderFile(f, toggleContent)}
-                            </div>
-                        )
-                      },
-                      default: () => {
-                        return renderContextMenu(f)
-                      }
-                    }
-                  }
-
-                  return <div>
-                    <g-menu {...menuData}/>
-                  </div>
-                })}
-              </div>
-          )
-        } else {
-          return (
-              <fragment>
-                <g-icon class="empty-folder__icon" color="#bdbdbd" xLarge>far fa-folder-open</g-icon>
-                <span class="empty-folder-message">Empty folder</span>
-              </fragment>
-          )
-        }
+        return (
+            <g-menu {...menuData}/>
+        )
       }
 
       function renderFile(f, toggleContextMenu) {
         const fileElData = {
+          class: {
+            'file--cut': props.fileInClipboard && f && props.fileInClipboard._id === f._id,
+          },
           scopedSlots: {
             default: context.slots[props.slotNames.file]
           },
@@ -81,13 +98,15 @@
           on: {
             click(file) {
               selectedFile.value = file;
-              context.emit('openFile', file)
+              if (!file.isFolder) showFileViewerDialog.value = true
+              context.emit('open', file)
             },
             dblclick(file) {
             },
             contextmenu(e, file) {
+              e.stopPropagation()
               toggleContextMenu(e)
-              openingContextMenu.value = file
+              selectedFile.value = file
             },
             updateFileName(file, newFileName) {
               file.fileName = newFileName;
@@ -103,20 +122,48 @@
           props: {
             appendContextOptions: props.appendContextOptions,
             file,
+            fileInClipboard: props.fileInClipboard,
+            path: props.path,
           },
           scopedSlots: {
             default: context.slots[props.slotNames.contextMenu],
           },
           on: {
-            openFile: file => context.emit('openFile', file),
-            cutFile: file => context.emit('cutFile', file),
-            pasteFile: file => context.emit('pasteFile', file),
-            deleteFile: file => context.emit('deleteFile', file),
-            renameFile: file => context.emit('renameFile', file),
+            open: file => {
+              selectedFile.value = file;
+              if (!file.isFolder) showFileViewerDialog.value = true
+              context.emit('open', file)
+            },
+            cut: file => {
+              context.emit('update:fileInClipboard', file)
+              context.emit('cut', file)
+            },
+            paste: file => {
+              context.emit('update:fileInClipboard', null)
+              if (props.path !== file.folderPath) context.emit('paste', file)
+            },
+            delete: file => context.emit('delete', file),
+            rename: file => context.emit('rename', file),
+            newFile: () => context.emit('newFile'),
+            newFolder: () => context.emit('newFolder'),
           }
         }
 
         return <ContextMenu {...elementData}/>
+      }
+
+      function renderFileViewerDialog() {
+        const dialogData = {
+          props: {
+            showDialog: showFileViewerDialog.value,
+            file: selectedFile.value,
+          },
+          on: {
+            close: () => showFileViewerDialog.value = false,
+          }
+        }
+
+        return <file-viewer-dialog {...dialogData}/>
       }
 
       function render() {
@@ -125,13 +172,11 @@
             'file-explorer-panel': true,
             'file-explorer-panel--empty': !Array.isArray(props.files) || props.files.length === 0,
           },
-          on: {
-            click: () => openingContextMenu.value = null
-          },
         }
 
         return <div {...elementData}>
           {renderFileContainer(props.files)}
+          {renderFileViewerDialog()}
         </div>
       }
 
@@ -147,42 +192,41 @@
 
 <style lang="scss" scoped>
   .file-explorer-panel {
-    min-height: 100%;
+    height: 100%;
 
     &--empty {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
     }
-  }
 
-  .file-container {
-    display: flex;
-    flex-wrap: wrap;
+    .empty-folder-message {
+      color: #bdbdbd;
+      font-size: 3em;
+    }
 
-    &--grid ::v-deep {
-      flex-direction: row;
-      text-align: center;
+    ::v-deep .file-container {
+      &--grid {
+        display: grid;
+        grid-gap: 0.5%;
+        row-gap: 10px;
+        grid-template-columns: repeat(12, 7.83%);
+        text-align: center;
 
-      > div {
-        flex: 0 1 8%;
-        padding-top: 4px;
-        height: 100%;
+        > div {
+          padding-top: 4px;
+          height: 100%;
+        }
+      }
+
+      &--list {
+        flex-direction: column;
+
+        > div:nth-child(even) {
+          background-color: #f7f7f7;
+        }
+      }
+
+      .file--cut {
+        opacity: 0.6;
       }
     }
-
-    &--list ::v-deep {
-      flex-direction: column;
-
-      > div:nth-child(even) {
-        background-color: #f7f7f7;
-      }
-    }
-  }
-
-  .empty-folder-message {
-    color: #bdbdbd;
-    font-size: 3em;
   }
 </style>

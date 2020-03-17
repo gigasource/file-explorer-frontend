@@ -39,12 +39,17 @@
         }
 
         const elementData = {
+          class: {
+            'address-bar': true,
+            'elevation-2': true,
+          },
           scopedSlots: {
             item: props => {
               return (
-                  <g-breadcrumbs-item disabled={props.item.disabled} vOn:click={() => updatePath(props.item.absolutePath)}>
+                  <g-btn background-color="#e0e0e0" flat small style="min-width: initial" disabled={props.item.disabled}
+                                      vOn:click={() => updatePath(props.item.absolutePath)}>
                     {props.item.folderName}
-                  </g-breadcrumbs-item>
+                  </g-btn>
               )
             }
           },
@@ -67,6 +72,11 @@
   }
 </script>
 
-<style scoped>
-
+<style scoped lang="scss">
+  .address-bar {
+    flex-grow: 1 !important;
+    padding: 0 8px !important;
+    height: 80%;
+    background-color: white;
+  }
 </style>

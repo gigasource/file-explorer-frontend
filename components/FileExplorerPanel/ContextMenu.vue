@@ -1,11 +1,14 @@
 <script>
   import {Fragment} from 'vue-fragment'
+  import {computed} from '@vue/composition-api'
 
   export default {
     name: 'ContextMenu',
     props: {
       appendContextOptions: Array,
       file: Object,
+      fileInClipboard: Object,
+      path: String,
     },
     components: {
       Fragment
@@ -19,14 +22,39 @@
         borderedOption: 'border',
       }
 
+      const disablePaste = computed(() => {
+        return props.path.startsWith(props.fileInClipboard.folderPath + props.fileInClipboard.fileName + '/')
+      });
+
       function renderBaseContextOptions() {
+        function createOptionData(action, classes, disabled) {
+          if (!classes) classes = {}
+
+          return {
+            class: {
+              'context-menu-option': true,
+              'context-menu-option__disabled': disabled,
+              ...classes,
+            },
+            on: {
+              click: () => {
+                if (disabled) return
+                if (action === 'paste') context.emit(action, props.fileInClipboard)
+                else context.emit(action, props.file)
+              }
+            }
+          }
+        }
+
         return (
             <fragment>
-              <div class='context-menu-option border' vOn:click={() => context.emit('openFile', props.file)}>Open</div>
-              <div class='context-menu-option' vOn:click={() => context.emit('cutFile', props.file)}>Cut</div>
-              <div class='context-menu-option' vOn:click={() => context.emit('pasteFile', props.file)}>Paste</div>
-              <div class='context-menu-option' vOn:click={() => context.emit('deleteFile', props.file)}>Delete</div>
-              <div class='context-menu-option' vOn:click={() => context.emit('renameFile', props.file)}>Rename</div>
+              <div {...createOptionData('open', {'border': true}, !props.file)}>Open</div>
+              <div {...createOptionData('newFile', null)}>Upload file</div>
+              <div {...createOptionData('newFolder', {'border': true})}>New folder</div>
+              <div {...createOptionData('cut', null, !props.file)}>Cut</div>
+              <div {...createOptionData('paste', null, !props.fileInClipboard || disablePaste.value)}>Paste</div>
+              <div {...createOptionData('delete', null, !props.file)}>Delete</div>
+              <div {...createOptionData('rename', null, !props.file)}>Rename</div>
             </fragment>
         )
       }
@@ -66,7 +94,7 @@
 
 <style lang="scss" scoped>
   ::v-deep .context-menu {
-    opacity: 0.98;
+    z-index: 100;
     border: 1px solid #9E9E9E;
     box-shadow: -1px 1px 6px rgba(0, 0, 0, 0.19);
     border-radius: 4px;
@@ -94,6 +122,10 @@
 
       &:hover {
         background: #efefef;
+      }
+
+      &__disabled {
+        display: none;
       }
     }
   }
