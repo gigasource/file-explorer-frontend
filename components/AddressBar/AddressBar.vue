@@ -22,7 +22,7 @@
             })
 
         paths.unshift({
-          folderName: '/',
+          folderName: 'Home',
           disabled: false,
           absolutePath: '/',
         })
@@ -34,14 +34,12 @@
         const updatePath = absolutePath => context.emit('updatePath', absolutePath)
 
         if (context.slots.default) {
-          debugger
           return context.slots.default({breadcrumbs: breadcrumbs.value, updatePath})
         }
 
         const elementData = {
           class: {
             'address-bar': true,
-            'elevation-2': true,
           },
           scopedSlots: {
             item: props => {
@@ -76,7 +74,9 @@
   .address-bar {
     flex-grow: 1 !important;
     padding: 0 8px !important;
-    height: 80%;
+    height: 70%;
     background-color: white;
+    margin: 0 0.25rem !important;
+    color: #212121;
   }
 </style>

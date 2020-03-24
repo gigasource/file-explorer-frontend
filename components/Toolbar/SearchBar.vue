@@ -12,13 +12,15 @@
 
       const renderSearchField = function () {
         const fallbackContent = (
-            <div class="search row-flex align-items-center br-2 pa-1 elevation-2">
-              <g-text-field type="text" prependIcon="search"
-                            value={props.searchText} vOn:input={onSearchInput} placeholder={props.placeholder}/>
-            </div>
+            <g-text-field class="mx-1 search row-flex align-items-center br-2 pa-1" type="text" prependInnerIcon="search"
+                          solo flat value={props.searchText} vOn:input={onSearchInput} placeholder={props.placeholder}/>
         );
 
-        return (context.slots.default && context.slots.default({onSearchInput, searchText: props.searchText, placeholder: props.placeholder}))
+        return (context.slots.default && context.slots.default({
+              onSearchInput,
+              searchText: props.searchText,
+              placeholder: props.placeholder
+            }))
             || fallbackContent
       };
 
@@ -34,10 +36,15 @@
 
 <style lang="scss" scoped>
   .search {
-    padding: 0 4px !important;
-    height: 80%;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    height: 70%;
     background-color: #FFFFFF;
-    margin-left: 8px;
+    width: initial;
+    flex-grow: 0;
+    box-shadow: none;
 
     .g-tf-wrapper {
       margin: 0;

@@ -35,7 +35,7 @@
       })
 
       function makeTreeClickable(tree) {
-        tree.forEach(e => {
+        if (tree) tree.forEach(e => {
           e.clickable = true;
           if (e.folders && e.folders.length > 0) makeTreeClickable(e.folders);
         });
@@ -54,14 +54,22 @@
       }
 
       function nodeIcon(node) {
+        if (node.node.folderName === '/') return 'fas fa-home'
         return node.state.selected || !node.state.collapse ? 'fas fa-folder-open' : 'fas fa-folder'
+      }
+
+      function itemText(node) {
+        if (!node) return ''
+
+        if (node.folderName === '/') return 'Home'
+        else return node.folderName
       }
 
       function render() {
         const elementData = {
           props: {
             data: treeData.value,
-            itemText: 'folderName',
+            itemText,
             itemChildren: 'folders',
             itemIcon: nodeIcon,
             expandLevel: 2,
@@ -72,11 +80,15 @@
           },
         }
 
-        return (
-            <div class="test">
-              <g-side-bar-tree-view {...elementData}/>
-            </div>
-        )
+        if (props.folderTree) {
+          return (
+              <div class="folder-tree">
+                <g-side-bar-tree-view {...elementData}/>
+              </div>
+          )
+        } else {
+          return <div/>
+        }
       }
 
       return {render, selectedPath}
@@ -88,9 +100,14 @@
 </script>
 
 <style scoped lang="scss">
-  .test ::v-deep {
+  .folder-tree ::v-deep {
     .g-treeview-item {
       border: 1px solid transparent;
+      font-weight: bold;
+
+      .g-icon {
+        color: #2962FF;
+      }
     }
 
     .g-treeview-wrapper {

@@ -133,9 +133,19 @@
     &--list {
       padding: 8px;
 
+      .file-thumbnail {
+        width: 60px;
+        height: 60px;
+      }
+
+      .file-icon {
+        font-size: 60px !important;
+        padding: 0 !important;
+      }
+
       .file-name {
         word-break: break-all;
-        padding-left: 6px;
+        padding-left: 12px;
       }
     }
 

@@ -1,6 +1,6 @@
 <script>
   import _ from 'lodash'
-  import {ref, watch} from '@vue/composition-api'
+  import {ref, watch, computed, onMounted} from '@vue/composition-api'
   import Toolbar from './Toolbar/Toolbar'
   import AddressBar from './AddressBar/AddressBar'
   import FileExplorerPanel from './FileExplorerPanel/FileExplorerPanel'
@@ -12,53 +12,53 @@
     name: 'FileExplorer',
     components: {FolderTree, FileExplorerPanel, AddressBar, Toolbar, Fragment},
     props: {
-      path: String,
-      files: Array,
-      getFiles: Function, //function getFiles(path) on path change
+      apiHandler: Object,
+
       accept: String,
       appendContextOptions: Array,
       addressBarDivider: {
         type: String,
         default: '->',
       },
-      folderTree: Array,
     },
     setup(props, context) {
-      const fileInClipboard = ref(null)
       // slot name for children components
       const toolbarSlots = {
         viewModeSelection: 'view-mode-selection',
-        fileFilter: 'file-filter',
-        fileGroup: 'file-group',
         fileSort: 'file-sort',
         btnBack: 'btn-back',
         btnNewFile: 'btn-new-file',
         btnNewFolder: 'btn-new-folder',
         searchBar: 'search-bar',
       }
-
       const fileExplorerPanelSlots = {
         contextMenu: 'context-menu',
         file: 'file',
       }
-
       const addressBarSlots = {
         addressBar: 'address-bar',
       }
 
+      const fileInClipboard = ref(null)
       const viewMode = ref('grid')
-      const fileFilter = ref(null)
-      const fileGroup = ref(null)
       const fileSort = ref('az')
-
-      const sort = ref({
-        type: 'name',
-        asc: true
-      })
-      const display = ref('grid')
-      const group = ref('')
       const searchText = ref('')
-      const activeFiles = ref(props.files)
+
+      const path = ref('/')
+      const files = ref(null)
+      const folderTree = ref(null)
+
+      const uploadingItems = ref([])
+      const showFileUploadProgressDialog = ref(false)
+
+      async function refresh() {
+        files.value = await props.apiHandler.getFilesInPath(path.value)
+        folderTree.value = await props.apiHandler.getFolderTree(path.value)
+      }
+
+      watch(() => [path.value], refresh)
+
+      const activeFiles = computed(() => getFilteredFiles(files.value, path.value, fileSort.value, searchText.value))
 
       function openFile(file) {
         if (file.isFolder) {
@@ -66,16 +66,35 @@
           folderArray.push(file.fileName)
           const folderPath = folderArrayToFolderParth(folderArray)
 
-          return context.emit('update:path', folderPath)
+          return path.value = folderPath
         }
-        //todo open file
       }
 
-      function getFilesByPath(files, path) {
-        return files.filter(file => file.folderPath === path)
+      async function uploadFiles(files) {
+        const uploads = await props.apiHandler.uploadFiles(files, path.value, refresh)
+
+        showFileUploadProgressDialog.value = true
+        uploadingItems.value = uploadingItems.value.concat(uploads)
       }
 
-      function getFilteredFiles(files, path, sort, filter, group, searchText) {
+      function openUploadFileDialog() {
+        const input = document.createElement('input')
+        input.type = 'file'
+        input.accept = '*'
+        input.multiple = true
+        input.addEventListener('change', e => uploadFiles(e.target.files));
+        document.body.appendChild(input)
+        input.style.display = 'none'
+        input.click()
+        input.parentNode.removeChild(input)
+      }
+
+      async function onNewFolder() {
+        await props.apiHandler.createNewFolder(path.value)
+        await refresh()
+      }
+
+      function getFilteredFiles(files, path, sort, searchText) {
         if (!files) return
 
         let tempFiles = _.cloneDeep(files)
@@ -101,59 +120,35 @@
         }
       }
 
-      watch(() => [props.files, props.path, fileSort.value, fileFilter.value, group.value, searchText.value], (newValues, oldValues) => {
-        if (!newValues || newValues === oldValues) return
-
-        activeFiles.value = getFilteredFiles(props.files, props.path, fileSort.value, fileFilter.value, group.value, searchText.value)
-      })
-
-
-      if (props.getFiles && typeof props.getFiles === 'function') {
-        watch(() => props.path, (newValues, oldValues) => {
-          if (newValues !== oldValues) {
-            const files = props.getFiles(props.path)
-            context.emit('update:files', files)
-          }
-        }, {lazy: true})
-      }
-
       function renderToolbar() {
+        function onUp() {
+          const folderArray = folderPathToFolderArray(path.value)
+          folderArray.pop()
+
+          path.value = folderArrayToFolderParth(folderArray)
+        }
+
         return (
             <toolbar {...{
               scopedSlots: context.slots,
               props: {
                 selectedViewMode: viewMode.value,
-                selectedFilter: fileFilter.value,
                 selectedSort: fileSort.value,
-                selectedGroup: fileGroup.value,
                 viewMode: viewMode.value,
-                path: props.path,
+                path: path.value,
 
-                filter: fileFilter.value,
-                display: display.value,
-                group: group.value,
                 searchText: searchText.value,
                 slotNames: toolbarSlots,
                 addressBarDivider: props.addressBarDivider,
               },
               on: {
                 'update:viewMode': mode => viewMode.value = mode,
-                'update:filter': filter => fileFilter.value = filter,
-                'update:group': group => fileGroup.value = group,
                 'update:sort': sort => fileSort.value = sort,
-                newFile: openUploadFileDialog,
-                newFolder: () => context.emit('newFolder'),
-                up: () => {
-                  const folderArray = folderPathToFolderArray(props.path)
-                  folderArray.pop()
-                  const newPath = folderArrayToFolderParth(folderArray)
-
-                  context.emit('update:path', newPath)
-                },
-
-                'update:display': e => display.value = e,
                 'update:searchText': e => searchText.value = e,
-                'update:path': path => context.emit('update:path', path)
+                'update:path': p => path.value = p,
+                newFile: openUploadFileDialog,
+                newFolder: onNewFolder,
+                up: onUp,
               }
             }}/>
         )
@@ -166,7 +161,7 @@
             default: context.slots[addressBarSlots.addressBar],
           },
           props: {
-            path: props.path,
+            path: path.value,
             divider: props.addressBarDivider,
           },
           on: {
@@ -175,36 +170,61 @@
         }
 
         return <address-bar {...elementData}/>
-      }
-       */
+      }*/
 
       function renderFileExplorerPanel() {
+        function onCut(file) {
+          fileInClipboard.value = file
+        }
+
+        async function onPaste() {
+          if (!fileInClipboard.value) return
+
+          if (fileInClipboard.value.folderPath !== path.value) {
+            await props.apiHandler.pasteFile(path.value, fileInClipboard.value)
+            await refresh()
+          }
+          fileInClipboard.value = null
+        }
+
+        async function onDelete(file) {
+          await props.apiHandler.deleteFile(file)
+          await refresh()
+        }
+
+        async function onRename(file, newName) {
+          await props.apiHandler.renameFile(file, newName)
+          await refresh()
+        }
+
         const elementData = {
-          scopedSlots: {
-            [fileExplorerPanelSlots.contextMenu]: context.slots[fileExplorerPanelSlots.contextMenu],
-            [fileExplorerPanelSlots.file]: context.slots[fileExplorerPanelSlots.file],
-          },
+          scopedSlots: context.slots,
           props: {
             files: activeFiles.value,
-            path: props.path,
-            display: display.value,
+            path: path.value,
             slotNames: fileExplorerPanelSlots,
             appendContextOptions: props.appendContextOptions,
             viewMode: viewMode.value,
-            fileInClipboard: fileInClipboard.value
+            fileInClipboard: fileInClipboard.value,
+            uploadingItems: uploadingItems.value,
+            showFileUploadProgressDialog: showFileUploadProgressDialog.value
           },
           on: {
             'update:fileInClipboard': file => fileInClipboard.value = file,
+            'removeUploadItem': itemIndex => uploadingItems.value.splice(itemIndex, 1),
+            'update:uploadingItems': items => uploadingItems.value = items,
+            'update:showFileUploadProgressDialog': value => showFileUploadProgressDialog.value = value,
             open: file => {
               openFile(file)
               context.emit('open', file)
             },
-            cut: file => context.emit('cut', file),
-            paste: file => context.emit('paste', file),
-            delete: file => context.emit('delete', file),
-            rename: file => context.emit('rename', file),
+            cut: onCut,
+            paste: onPaste,
+            delete: onDelete,
+            rename: onRename,
             newFile: openUploadFileDialog,
-            newFolder: () => context.emit('newFolder'),
+            newFolder: onNewFolder,
+            uploadFiles
           }
         }
 
@@ -212,37 +232,25 @@
       }
 
       function renderFolderTree() {
-        const folders = props.files ? props.files.filter(f => f.isFolder) : []
+        const folders = files && files.value ? files.value.filter(f => f.isFolder) : []
+
+        function onFolderSelected(folderPath) {
+          if (!folderPath.endsWith('/')) folderPath += '/'
+          path.value = folderPath
+        }
 
         const elementData = {
           props: {
             folders,
-            folderTree: props.folderTree,
-            path: props.path,
+            folderTree: folderTree.value,
+            path: path.value,
           },
           on: {
-            folderSelected: folderPath => {
-              if (!folderPath.endsWith('/')) folderPath += '/'
-              context.emit('update:path', folderPath)
-            }
+            folderSelected: onFolderSelected
           }
         }
 
         return <folder-tree {...elementData} />
-      }
-
-      function openUploadFileDialog() {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = '*';
-        input.multiple = true;
-        input.addEventListener('change', e => {
-          document.body.removeChild(input);
-          context.emit('uploadFiles', e.target.files)
-        });
-        document.body.appendChild(input);
-        input.style.display = 'none';
-        input.click()
       }
 
       const render = () => {
@@ -266,7 +274,6 @@
       }
 
       return {
-        activeFiles,
         render
       }
     },
@@ -276,5 +283,8 @@
   }
 </script>
 
-<style scoped>
+<style lang="scss">
+  .file-explorer {
+    background-color: #ffffff;
+  }
 </style>

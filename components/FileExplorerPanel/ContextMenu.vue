@@ -38,9 +38,7 @@
             },
             on: {
               click: () => {
-                if (disabled) return
-                if (action === 'paste') context.emit(action, props.fileInClipboard)
-                else context.emit(action, props.file)
+                if (!disabled) context.emit(action, props.file)
               }
             }
           }

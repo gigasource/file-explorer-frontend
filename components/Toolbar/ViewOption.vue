@@ -4,6 +4,7 @@
   export default {
     name: 'ViewOption',
     props: {
+      disabled: Boolean,
       prependText: {
         type: String,
         default: '',
@@ -12,6 +13,15 @@
       options: Array,
       optionIcon: String,
       optionType: String,
+      backgroundColor: {
+        type: String,
+        default: 'white',
+      },
+      textColor: {
+        type: String,
+        default: '#616161',
+      },
+      outlined: Boolean,
     },
     setup(props, context) {
       const capitalize = function (s) {
@@ -47,8 +57,10 @@
                   scopedSlots: {
                     activator: ({on}) => {
                       return (
-                          <g-btn class="view-option__btn" vOn:click={on.click}>
-                            <g-icon class="file-icon" color="black" small>{props.optionIcon}</g-icon>
+                          <g-btn class="mx-1 view-option__btn" vOn:click={on.click} outlined={props.outlined} flat
+                                 background-color={props.backgroundColor} text-color={props.textColor}
+                                 disabled={props.disabled}>
+                            <g-icon class="file-icon" color="#000000" small>{props.optionIcon}</g-icon>
                             <span
                                 style="margin-left: 10px">{props.prependText}{props.selectedOption === null ? capitalize(props.optionType) : selectedOptionText.value}</span>
                           </g-btn>
@@ -59,7 +71,9 @@
                           <div class="view-option__options">
                             {props.options.map(({text, value}) => {
                               return (
-                                  <g-btn class="view-option__option"
+                                  <g-btn class="view-option__option" flat outlined={props.outlined} flat
+                                         background-color={props.backgroundColor} text-color={props.textColor}
+                                         disabled={props.disabled}
                                          vOn:click={() => onOptionSelected(value, text)}>{text}</g-btn>
                               )
                             })}
@@ -101,6 +115,6 @@
   }
 
   .view-option__btn {
-    height: 80% !important;
+    height: 70% !important;
   }
 </style>

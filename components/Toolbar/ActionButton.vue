@@ -4,8 +4,21 @@
     props: {
       actionName: String,
       actionIcon: String,
+      actionIconColor: {
+        type: String,
+        default: 'black',
+      },
       actionText: String,
       disabled: Boolean,
+      outlined: Boolean,
+      backgroundColor: {
+        type: String,
+        default: 'white',
+      },
+      textColor: {
+        type: String,
+        default: '#616161',
+      },
     },
     setup(props, context) {
       const capitalize = function (s) {
@@ -21,8 +34,10 @@
             context.slots.default({[props.actionName]: onAction})
             ||
             (
-                <g-btn class="action-btn" disabled={props.disabled} vOn:click={() => context.emit(props.actionName)}>
-                  <g-icon class="action-btn__icon" color="black" small>{props.actionIcon}</g-icon>
+                <g-btn outlined={props.outlined} class="mx-1 action-btn" disabled={props.disabled} flat
+                       background-color={props.backgroundColor} text-color={props.textColor}
+                       vOn:click={() => context.emit(props.actionName)}>
+                  <g-icon class="action-btn__icon" color={props.actionIconColor} small>{props.actionIcon}</g-icon>
                   <span style="margin-left: 10px">{capitalize(props.actionText)}</span>
                 </g-btn>
             )
@@ -40,7 +55,6 @@
 
 <style scoped lang="scss">
   .action-btn {
-    height: 80% !important;
-    margin-left: 5px;
+    height: 70% !important;
   }
 </style>

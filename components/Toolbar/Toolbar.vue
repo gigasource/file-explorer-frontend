@@ -23,6 +23,23 @@
     },
     name: 'Toolbar',
     setup(props, context) {
+      const renderUpButton = () => {
+        return <action-button {...{
+          props: {
+            actionText: 'Up',
+            actionIcon: 'fas fa-arrow-up',
+            actionName: 'up',
+            disabled: props.path === '/',
+          },
+          on: {
+            up: () => context.emit('up')
+          },
+          scopedSlots: {
+            default: context.slots[props.slotNames.btnBack]
+          }
+        }}/>
+      }
+
       const renderViewMode = () => {
         return <view-mode {...{
           props: {
@@ -35,28 +52,6 @@
             default: context.slots[props.slotNames.viewModeSelection]
           }
         }} />
-      }
-
-      const renderFileFilter = () => {
-        return <view-option {...{
-          props: {
-            selectedOption: props.selectedFilter,
-            options: [
-              {text: 'No filter', value: null},
-              {text: 'Image', value: 'image'},
-              {text: 'Video', value: 'video'},
-              {text: 'Folder', value: 'folder'},
-            ],
-            optionIcon: 'fas fa-filter',
-            optionType: 'filter',
-          },
-          on: {
-            'update:filter': filter => context.emit('update:filter', filter)
-          },
-          scopedSlots: {
-            default: context.slots[props.slotNames.fileFilter]
-          }
-        }}/>
       }
 
       const renderFileSort = () => {
@@ -125,9 +120,12 @@
       const renderNewFileButton = () => {
         return <action-button {...{
           props: {
-            actionText: 'Upload File',
+            actionText: 'Upload',
             actionIcon: 'fas fa-cloud-upload-alt',
             actionName: 'newFile',
+            actionIconColor: 'white',
+            backgroundColor: '#536DFE',
+            textColor: 'white',
           },
           on: {
             newFile: () => context.emit('newFile')
@@ -138,29 +136,15 @@
         }}/>
       }
 
-      const renderUpButton = () => {
-        return <action-button {...{
-          props: {
-            actionText: 'Up',
-            actionIcon: 'fas fa-arrow-up',
-            actionName: 'up',
-            disabled: props.path === '/',
-          },
-          on: {
-            up: () => context.emit('up')
-          },
-          scopedSlots: {
-            default: context.slots[props.slotNames.btnBack]
-          }
-        }}/>
-      }
-
       const renderNewFolderButton = () => {
         return <action-button {...{
           props: {
             actionText: 'New Folder',
-            actionIcon: 'fas fa-plus',
+            actionIcon: 'fas fa-plus-circle',
             actionName: 'newFolder',
+            outlined: true,
+            textColor: '#536DFE',
+            actionIconColor: '#536DFE',
           },
           on: {
             newFolder: () => context.emit('newFolder')
@@ -220,7 +204,7 @@
       display: flex;
       height: 50px;
       justify-content: space-between;
-      padding: 5px 10px;
+      padding: 0 10px;
       align-items: center;
       background-color: #E0E0E0;
       user-select: none;

@@ -2,11 +2,23 @@
   import {ref} from '@vue/composition-api'
   import File from './File'
   import ContextMenu from "./ContextMenu"
-  import FileViewerDialog from "./FileViewerDialog";
+  import FileViewerDialog from "./dialogs/FileViewerDialog"
+  import FileRenameDialog from './dialogs/FileRenameDialog'
+  import ActionConfirmDialog from "./dialogs/ActionConfirmDialog"
+  import FileUploadProgressDialog from "./dialogs/FileUploadProgressDialog";
+  import {Droppable} from "pos-vue-framework";
+  import DropZoneOverlay from "./DropZoneOverlay";
+  import _ from 'lodash'
 
   export default {
     name: 'FileExplorerPanel',
-    components: {FileViewerDialog, File, ContextMenu},
+    directives: {
+      Droppable
+    },
+    components: {
+      DropZoneOverlay,
+      FileUploadProgressDialog, ActionConfirmDialog, FileRenameDialog, FileViewerDialog, File, ContextMenu
+    },
     props: {
       files: [Array, Object],
       path: String,
@@ -14,11 +26,19 @@
       appendContextOptions: Array,
       viewMode: String,
       fileInClipboard: Object,
+      showFileUploadProgressDialog: Boolean,
+      uploadingItems: {
+        type: Array,
+        default: () => [],
+      }
     },
     setup(props, context) {
       const selectedFile = ref(null)
       const showContextMenu = ref(false)
       const showFileViewerDialog = ref(false)
+      const showFileRenameDialog = ref(false)
+      const showConfirmDeleteDialog = ref(false)
+      const showDropZoneOverlay = ref(false)
 
       function renderFileContainer() {
         const menuData = {
@@ -63,9 +83,19 @@
               } else {
                 return (
                     <div class="fill-height" {...contextMenuListener}>
-                      <div {...containerData}>
-                        <g-icon class="empty-folder__icon" color="#bdbdbd" xLarge>far fa-folder-open</g-icon>
-                        <span class="empty-folder-message">Empty folder</span>
+                      <div class="file-container--empty">
+                        <div class="ta-center">
+                          <img draggable="false" src="/plugins/cloud-signage-plugin/assets/empty_folder.svg"
+                               width="15%"/>
+                          <div class="file-container--empty__message">You haven't uploaded any content yet</div>
+                          <div class="file-container--empty__message">Click '<span
+                              style="font-weight: 600; color: #9a9a9a">Upload</span>' to get started
+                          </div>
+                          <div class="file-container--empty__upload mt-3" vOn:click={() => context.emit('newFile')}>
+                            <g-icon class="mr-2" xLarge color="#536DFE">fas fa-cloud-upload-alt</g-icon>
+                            <span class="mt-2">Upload</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                 )
@@ -74,7 +104,7 @@
             default: () => {
               return renderContextMenu(selectedFile.value)
             }
-          }
+          },
         }
 
         return (
@@ -135,15 +165,19 @@
               context.emit('open', file)
             },
             cut: file => {
-              context.emit('update:fileInClipboard', file)
               context.emit('cut', file)
             },
-            paste: file => {
-              context.emit('update:fileInClipboard', null)
-              if (props.path !== file.folderPath) context.emit('paste', file)
+            paste: () => {
+              context.emit('paste')
             },
-            delete: file => context.emit('delete', file),
-            rename: file => context.emit('rename', file),
+            delete: file => {
+              showConfirmDeleteDialog.value = true
+              selectedFile.value = file
+            },
+            rename: file => {
+              showFileRenameDialog.value = true
+              selectedFile.value = file
+            },
             newFile: () => context.emit('newFile'),
             newFolder: () => context.emit('newFolder'),
           }
@@ -153,7 +187,7 @@
       }
 
       function renderFileViewerDialog() {
-        const dialogData = {
+        const fileViewerDialogData = {
           props: {
             showDialog: showFileViewerDialog.value,
             file: selectedFile.value,
@@ -163,7 +197,65 @@
           }
         }
 
-        return <file-viewer-dialog {...dialogData}/>
+        return <file-viewer-dialog {...fileViewerDialogData}/>
+      }
+
+      function renderFileRenameDialog() {
+        const dialogData = {
+          props: {
+            files: props.files,
+            file: selectedFile.value,
+            value: showFileRenameDialog.value,
+          },
+          on: {
+            rename: (file, newName) => context.emit('rename', file, newName),
+            input: val => showFileRenameDialog.value = val,
+          }
+        }
+
+        return <file-rename-dialog {...dialogData} />
+      }
+
+      function renderConfirmDeleteDialog() {
+        const dialogData = {
+          props: {
+            file: selectedFile.value,
+            value: showConfirmDeleteDialog.value,
+            dialogTitle: `Delete ${selectedFile.value && selectedFile.value.isFolder ? 'folder' : 'file'} ${selectedFile.value && selectedFile.value.fileName}`,
+            dialogText: `Are you sure you want to delete this ${selectedFile.value && selectedFile.value.isFolder ? 'folder' : 'file'}?`,
+            confirmActionText: 'delete',
+          },
+          on: {
+            confirm: () => context.emit('delete', selectedFile.value),
+            input: val => showConfirmDeleteDialog.value = val,
+          },
+          directives: {}
+        }
+
+        return <action-confirm-dialog {...dialogData} />
+      }
+
+      function renderFileUploadProgressDialog() {
+        const dialogData = {
+          props: {
+            value: props.showFileUploadProgressDialog,
+            uploadingItems: props.uploadingItems,
+          },
+          on: {
+            input: value => context.emit('update:showFileUploadProgressDialog', value),
+            'removeUploadItem': itemIndex => context.emit('removeUploadItem', itemIndex),
+            'update:uploadingItems': items => context.emit('update:uploadingItems', items),
+          }
+        }
+
+        return <file-upload-progress-dialog {...dialogData}/>
+      }
+
+      function renderDropZoneOverlay() {
+        return <drop-zone-overlay
+            value={showDropZoneOverlay.value}
+            vOn:input={val => showDropZoneOverlay.value = val}
+            vOn:dropFiles={fileList => context.emit('uploadFiles', fileList)}/>
       }
 
       function render() {
@@ -172,11 +264,32 @@
             'file-explorer-panel': true,
             'file-explorer-panel--empty': !Array.isArray(props.files) || props.files.length === 0,
           },
+          directives: [
+            {
+              name: 'droppable',
+              value: true,
+              modifiers: {file: true}
+            }
+          ],
+          on: {
+            'drag-over': _.debounce(
+                function () {
+                  showDropZoneOverlay.value = true
+                }, 100, {
+                  leading: true,
+                  trailing: false,
+                }
+            ),
+          }
         }
 
         return <div {...elementData}>
           {renderFileContainer(props.files)}
+          {renderDropZoneOverlay()}
           {renderFileViewerDialog()}
+          {renderFileRenameDialog()}
+          {renderConfirmDeleteDialog()}
+          {renderFileUploadProgressDialog()}
         </div>
       }
 
@@ -192,14 +305,10 @@
 
 <style lang="scss" scoped>
   .file-explorer-panel {
+    position: relative;
     height: 100%;
 
     &--empty {
-    }
-
-    .empty-folder-message {
-      color: #bdbdbd;
-      font-size: 3em;
     }
 
     ::v-deep .file-container {
@@ -207,7 +316,7 @@
         display: grid;
         grid-gap: 0.5%;
         row-gap: 10px;
-        grid-template-columns: repeat(12, 7.83%);
+        grid-template-columns: repeat(8, 12%);
         text-align: center;
 
         > div {
@@ -221,6 +330,28 @@
 
         > div:nth-child(even) {
           background-color: #f7f7f7;
+        }
+      }
+
+      &--empty {
+        height: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+
+        &__message {
+          color: #bdbdbd;
+          font-size: 2em;
+        }
+
+        &__upload {
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #536DFE;
+          font-size: 1.75em;
         }
       }
 
