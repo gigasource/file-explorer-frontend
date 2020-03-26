@@ -1,7 +1,12 @@
+import {setPropertyMappings, transformInternal} from '../utils/property-mapping'
+import ax from 'axios';
+
 function createCommonApiHandlers(options) {
-  const {
-    apiBaseUrl,
-  } = options;
+  let initialized = false
+  const {apiBaseUrl, userNamespace} = options;
+
+  const axios = ax.create()
+  if (userNamespace) axios.defaults.headers.common['user'] = userNamespace;
 
   if (!apiBaseUrl) throw new Error('Missing apiBaseUrl in parameter object')
 
@@ -13,18 +18,25 @@ function createCommonApiHandlers(options) {
   }
 
   async function getFilesInPath(folderPath) {
-    return (await axios.get(`${apiBaseUrl}/file-metadata?folderPath=${folderPath}`)).data
+    if (!initialized) {
+      setPropertyMappings((await axios.get(`${apiBaseUrl}/property-mappings`)).data)
+      initialized = true
+    }
+
+    const data = (await axios.get(`${apiBaseUrl}/file-metadata?folderPath=${folderPath}`)).data
+
+    return transformInternal(data)
   }
 
   async function getFolderTree() {
-    return (await axios.get(`${apiBaseUrl}/folder-tree`)).data;
+    return transformInternal((await axios.get(`${apiBaseUrl}/folder-tree`)).data);
   }
 
   async function renameFile(file, newFileName) {
     const id = file._id;
     const apiUrl = `${apiBaseUrl}/file-metadata/rename/${id}`;
     const requestBody = {
-      fileName: newFileName
+      newFileName
     }
 
     await axios.put(apiUrl, requestBody);

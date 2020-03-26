@@ -104,9 +104,12 @@
     .g-treeview-item {
       border: 1px solid transparent;
       font-weight: bold;
+      font-size: 14px;
 
       .g-icon {
         color: #2962FF;
+        font-size: 16px !important;
+        margin: 4px;
       }
     }
 

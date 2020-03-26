@@ -1,11 +1,18 @@
 import createCommonApiHandlers from './common'
 import forEach from 'lodash/forEach'
-import axios from 'axios'
+import ax from 'axios'
+
+//TODO: replace this as this is a project-specific utility
+import FileStreamChunkReader from "../../components/utils/FileStreamChunkReader";
+import md5 from 'md5';
 
 const CancelToken = axios.CancelToken
 
 function createAwsS3Handlers(options) {
-  const {apiBaseUrl} = options;
+  const {apiBaseUrl, userNamespace} = options;
+
+  const axios = ax.create()
+  if (userNamespace) axios.defaults.headers.common['user'] = userNamespace;
 
   if (!apiBaseUrl) throw new Error('Missing apiBaseUrl in parameter object')
 
@@ -73,14 +80,21 @@ function createAwsS3Handlers(options) {
   }
 
   async function createFileMetadata(file, folderPath, generatedFileName) {
-    const fileMetadata = {
+    let fileMetadata = {
       isFolder: false,
       fileName: file.name,
       folderPath,
       mimeType: file.type,
       sizeInBytes: file.size,
-      fileId: file.fileDownloadUrl,
+      fileSource: file.fileDownloadUrl,
       generatedFileName,
+    }
+
+    if (file.type.startsWith('video')) {
+      const partsData = await getVideoPartsMetadata(file)
+      const videoDuration = await getVideoDurationMetadata(file)
+
+      fileMetadata = {...fileMetadata, parts: partsData, duration: videoDuration}
     }
 
     await axios.post(`${apiBaseUrl}/file-metadata`, fileMetadata)
@@ -91,8 +105,8 @@ function createAwsS3Handlers(options) {
 
     return files.map(file => ({
       ...file,
-      viewUrl: file.fileId,
-      downloadUrl: file.fileId,
+      viewUrl: file.fileSource,
+      downloadUrl: file.fileSource,
     }))
   }
 
@@ -102,6 +116,41 @@ function createAwsS3Handlers(options) {
     let filesInFolder = await getFiles(folderPath)
     filesInFolder = insertFileUrl(filesInFolder)
     return filesInFolder
+  }
+
+  async function getVideoDurationMetadata(file) {
+    return new Promise(resolve => {
+      window.URL = window.URL || window.webkitURL;
+      const video = document.createElement('video');
+      video.preload = 'metadata';
+
+      video.onloadedmetadata = function () {
+        window.URL.revokeObjectURL(video.src)
+        resolve(Math.round(video.duration))
+      }
+
+      video.src = URL.createObjectURL(file)
+    })
+  }
+
+  function getVideoPartsMetadata(file) {
+    return new Promise(resolve => {
+      const parts = [];
+
+      let n = 0;
+      const onChunk = (chunk) => {
+        parts.push({
+          n: n++,
+          md5: md5(chunk),
+        })
+      };
+
+      function onReadComplete() {
+        resolve(parts)
+      }
+
+      new FileStreamChunkReader(file.stream().getReader()).read(onChunk, onReadComplete)
+    })
   }
 
   return {

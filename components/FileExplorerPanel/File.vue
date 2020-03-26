@@ -1,9 +1,10 @@
 <script>
-  import {ref} from '@vue/composition-api';
   import ContextMenu from "./ContextMenu";
+  import {Draggable} from "pos-vue-framework";
 
   export default {
     name: 'File',
+    directives: {Draggable},
     components: {ContextMenu},
     props: {
       file: Object,
@@ -12,32 +13,27 @@
         default: false,
       },
       viewMode: String,
-    },
-    directives: {
-      focus: {
-        inserted: function (el) {
-          el.click()
-        }
-      }
+      draggable: Boolean,
     },
     setup(props, context) {
-      const isEditingName = ref(false)
-
       function renderFileIcon() {
         if (props.file.mimeType && props.file.mimeType.startsWith('image') && props.file.viewUrl) {
-          return <img class="file-thumbnail" src={props.file.viewUrl}/>
+          return <img draggable="false" class="file-thumbnail" src={props.file.viewUrl}/>
+        } else if (props.file.mimeType && props.file.mimeType.startsWith('video')) {
+          return <img class="file-icon" src="/plugins/cloud-signage-plugin/assets/video-thumb-grid-item.svg"
+                      draggable="false"/>
         } else {
-          let icon = 'fas fa-file';
-
-          if (props.file.isFolder) icon = 'fas fa-folder';
-          else if (props.file.mimeType && props.file.mimeType.startsWith('video')) icon = 'fas fa-film';
-
-          return <g-icon class="file-icon" color="blue">{icon}</g-icon>
+          if (props.file.isFolder) {
+            return <img class="file-icon" src="/plugins/cloud-signage-plugin/assets/folder-image.svg"
+                        draggable="false"/>
+          } else {
+            return <g-icon draggable="false" class="file-icon" color="blue">fas fa-file</g-icon>
+          }
         }
       }
 
       function renderFileName() {
-        let fileName = props.file.fileName;
+        /*let fileName = props.file.fileName;
 
         const fileNameEditEventListeners = {
           on: {
@@ -46,16 +42,15 @@
               isEditingName.value = false;
             }
           }
-        }
+        }*/
 
-        if (!isEditingName.value) return (
+        return (
             <span class="file-name">
               {props.file.fileName}
             </span>
         )
 
-        // vFocus is a custom directive declared on top of this file
-        else return (
+        /*else return (
             <div class="file-name-edit">
               <g-text-field
                   outlined vFocus dense
@@ -63,7 +58,7 @@
                   value={fileName}
                   vOn:input={newName => fileName = newName}/>
             </div>
-        )
+        )*/
       }
 
       const renderFile = () => {
@@ -88,6 +83,18 @@
               context.emit('contextmenu', e, props.file);
             },
           },
+        }
+
+        if (props.draggable) {
+          Object.assign(fileData, {
+            directives: [
+              {
+                name: 'draggable',
+                value: props.file,
+                modifiers: {move: true}
+              }
+            ]
+          })
         }
 
         if (context.slots.default) return context.slots.default({
@@ -140,6 +147,8 @@
 
       .file-icon {
         font-size: 60px !important;
+        width: 60px;
+        height: 60px;
         padding: 0 !important;
       }
 
@@ -185,8 +194,16 @@
       width: 60px;
       height: 60px;
     }
+
     .file-icon {
       font-size: 60px !important;
+      width: 60px;
+      height: 60px;
+    }
+
+    .file-name {
+      margin-top: 8px;
+      font-size: 12px;
     }
   }
 </style>

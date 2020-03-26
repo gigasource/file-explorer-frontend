@@ -16,14 +16,16 @@
 
               return {
                 folderName: item,
-                disabled: index === array.length - 1,
+                index: index + 1,
+                length: array.length + 1,
                 absolutePath,
               }
             })
 
         paths.unshift({
           folderName: 'Home',
-          disabled: false,
+          index: 0,
+          length: paths.length + 1,
           absolutePath: '/',
         })
 
@@ -31,7 +33,7 @@
       });
 
       function render() {
-        const updatePath = absolutePath => context.emit('updatePath', absolutePath)
+        const updatePath = absolutePath => context.emit('update:path', absolutePath)
 
         if (context.slots.default) {
           return context.slots.default({breadcrumbs: breadcrumbs.value, updatePath})
@@ -43,11 +45,34 @@
           },
           scopedSlots: {
             item: props => {
+              const itemData = {
+                class: {
+                  'breadcrumb-item': true,
+                  'breadcrumb-item--blurred': props.item.length > 1 && props.item.index < props.item.length - 1,
+                },
+                on: {
+                  click: () => {
+                    if (props.item.index === props.item.length - 1) return
+                    updatePath(props.item.absolutePath)
+                  }
+                }
+              }
+
               return (
-                  <g-btn background-color="#e0e0e0" flat small style="min-width: initial" disabled={props.item.disabled}
-                                      vOn:click={() => updatePath(props.item.absolutePath)}>
-                    {props.item.folderName}
-                  </g-btn>
+                  <div {...itemData}>
+                    {
+                      props.item.absolutePath !== '/'
+                          ? <img width="12px" draggable="false"
+                                 src="/plugins/cloud-signage-plugin/assets/file-explorer-path-folder.svg"/>
+                          : ''
+                    }
+                    <span class="ml-1">{props.item.folderName}</span>
+                  </div>
+              )
+            },
+            divider: () => {
+              return (
+                  <img draggable="false" src="/plugins/cloud-signage-plugin/assets/file-explorer-path-separator.svg"/>
               )
             }
           },
@@ -57,7 +82,9 @@
           }
         }
 
-        return <g-breadcrumbs {...elementData}/>
+        return context.slots.default
+            ? context.slots.default()
+            : <g-breadcrumbs {...elementData}/>
       }
 
       return {
@@ -78,5 +105,20 @@
     background-color: white;
     margin: 0 0.25rem !important;
     color: #212121;
+
+    ::v-deep .g-breadcrumbs-divider {
+      padding: 0 4px !important;
+    }
+
+    ::v-deep .breadcrumb-item {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+
+      &--blurred {
+        color: #bdbdbd;
+      }
+    }
+
   }
 </style>

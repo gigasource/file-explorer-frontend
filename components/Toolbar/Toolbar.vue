@@ -1,5 +1,4 @@
 <script>
-  import _ from 'lodash'
   import SearchBar from "./SearchBar"
   import ViewMode from './ViewMode'
   import ViewOption from "./ViewOption";
@@ -20,10 +19,18 @@
         type: String,
         default: '->',
       },
+      hideComponents: Array,
+      addressBarVNode: Object,
     },
     name: 'Toolbar',
     setup(props, context) {
+      function isHidden(componentName) {
+        return props.hideComponents.includes(componentName)
+      }
+
       const renderUpButton = () => {
+        if (isHidden(props.slotNames.btnBack)) return ''
+
         return <action-button {...{
           props: {
             actionText: 'Up',
@@ -41,6 +48,8 @@
       }
 
       const renderViewMode = () => {
+        if (isHidden(props.slotNames.viewModeSelection)) return ''
+
         return <view-mode {...{
           props: {
             selectedViewMode: props.selectedViewMode
@@ -55,6 +64,8 @@
       }
 
       const renderFileSort = () => {
+        if (isHidden(props.slotNames.fileSort)) return ''
+
         return <view-option {...{
           props: {
             prependText: 'Sort: ',
@@ -77,6 +88,7 @@
         }}/>
       }
 
+      /*
       const renderFileGroup = () => {
         return <view-option {...{
           props: {
@@ -97,8 +109,11 @@
           }
         }}/>
       }
+      */
 
       const renderSearchBar = () => {
+        if (isHidden(props.slotNames.searchBar)) return ''
+
         const onInput = function (searchText) {
           context.emit('update:searchText', searchText)
         }
@@ -118,6 +133,8 @@
       }
 
       const renderNewFileButton = () => {
+        if (isHidden(props.slotNames.btnNewFile)) return ''
+
         return <action-button {...{
           props: {
             actionText: 'Upload',
@@ -137,6 +154,8 @@
       }
 
       const renderNewFolderButton = () => {
+        if (isHidden(props.slotNames.btnNewFolder)) return ''
+
         return <action-button {...{
           props: {
             actionText: 'New Folder',
@@ -156,23 +175,9 @@
       }
 
       function renderAddressBar() {
-        const elementData = {
-          class: {
-            'ml-2': true,
-          },
-          props: {
-            path: props.path,
-            divider: props.addressBarDivider,
-          },
-          on: {
-            updatePath: path => context.emit('update:path', path),
-          },
-          scopedSlots: {
-            default: context.slots[props.slotNames.addressBar],
-          },
-        }
+        if (isHidden(props.slotNames.addressBar)) return ''
 
-        return <address-bar {...elementData}/>
+        return props.addressBarVNode
       }
 
       const renderToolbar = () => {

@@ -1,6 +1,6 @@
 <script>
   import _ from 'lodash'
-  import {ref, watch, computed, onMounted} from '@vue/composition-api'
+  import {ref, watch, computed} from '@vue/composition-api'
   import Toolbar from './Toolbar/Toolbar'
   import AddressBar from './AddressBar/AddressBar'
   import FileExplorerPanel from './FileExplorerPanel/FileExplorerPanel'
@@ -18,7 +18,24 @@
       appendContextOptions: Array,
       addressBarDivider: {
         type: String,
-        default: '->',
+        default: '>',
+      },
+      viewMode: {
+        type: String,
+        default: 'grid',
+      },
+      /*
+        Slot names will be used to hide components, for example:
+        ['file-sort', 'btn-back', 'btn-new-file', 'address-bar']
+       */
+      hideComponents: {
+        type: Array,
+        default: () => []
+      },
+      draggable: Boolean,
+      droppable: {
+        type: Boolean,
+        default: true,
       },
     },
     setup(props, context) {
@@ -40,7 +57,7 @@
       }
 
       const fileInClipboard = ref(null)
-      const viewMode = ref('grid')
+      const viewMode = ref(props.viewMode)
       const fileSort = ref('az')
       const searchText = ref('')
 
@@ -120,7 +137,7 @@
         }
       }
 
-      function renderToolbar() {
+      function renderToolbar(addressBarVNode) {
         function onUp() {
           const folderArray = folderPathToFolderArray(path.value)
           folderArray.pop()
@@ -138,11 +155,16 @@
                 path: path.value,
 
                 searchText: searchText.value,
-                slotNames: toolbarSlots,
+                slotNames: {...toolbarSlots, ...addressBarSlots},
                 addressBarDivider: props.addressBarDivider,
+                hideComponents: props.hideComponents,
+                addressBarVNode,
               },
               on: {
-                'update:viewMode': mode => viewMode.value = mode,
+                'update:viewMode': mode => {
+                  viewMode.value = mode
+                  context.emit('update:viewMode', mode)
+                },
                 'update:sort': sort => fileSort.value = sort,
                 'update:searchText': e => searchText.value = e,
                 'update:path': p => path.value = p,
@@ -154,23 +176,27 @@
         )
       }
 
-      /** kept for future use if needed
-       function renderAddressBar() {
+      function renderAddressBar() {
+        // if (isHidden(addressBarSlots.addressBar)) return ''
+
         const elementData = {
-          scopedSlots: {
-            default: context.slots[addressBarSlots.addressBar],
+          class: {
+            'ml-2': true,
           },
           props: {
             path: path.value,
             divider: props.addressBarDivider,
           },
           on: {
-            updatePath: path => context.emit('update:path', path),
-          }
+            'update:path': p => path.value = p,
+          },
+          scopedSlots: {
+            default: context.slots[addressBarSlots.addressBar],
+          },
         }
 
         return <address-bar {...elementData}/>
-      }*/
+      }
 
       function renderFileExplorerPanel() {
         function onCut(file) {
@@ -207,7 +233,9 @@
             viewMode: viewMode.value,
             fileInClipboard: fileInClipboard.value,
             uploadingItems: uploadingItems.value,
-            showFileUploadProgressDialog: showFileUploadProgressDialog.value
+            showFileUploadProgressDialog: showFileUploadProgressDialog.value,
+            draggable: props.draggable,
+            droppable: props.droppable,
           },
           on: {
             'update:fileInClipboard': file => fileInClipboard.value = file,
@@ -254,14 +282,15 @@
       }
 
       const render = () => {
-        const toolbarVNode = renderToolbar()
+        const addressBarVNode = renderAddressBar()
+        const toolbarVNode = renderToolbar(addressBarVNode)
         const fileExplorerVNode = renderFileExplorerPanel()
         const folderTreeVNode = renderFolderTree()
 
         return (context.slots.components
             && (
                 <fragment>
-                  {context.slots.components({toolbarVNode, fileExplorerVNode, folderTreeVNode})}
+                  {context.slots.components({addressBarVNode, toolbarVNode, fileExplorerVNode, folderTreeVNode})}
                 </fragment>
             ))
             //fallback content
@@ -274,7 +303,7 @@
       }
 
       return {
-        render
+        render, openUploadFileDialog
       }
     },
     render() {

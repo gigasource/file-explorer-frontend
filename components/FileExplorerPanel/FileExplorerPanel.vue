@@ -30,7 +30,9 @@
       uploadingItems: {
         type: Array,
         default: () => [],
-      }
+      },
+      draggable: Boolean,
+      droppable: Boolean,
     },
     setup(props, context) {
       const selectedFile = ref(null)
@@ -124,6 +126,7 @@
             selected: f === selectedFile.value,
             file: f,
             viewMode: props.viewMode,
+            draggable: props.draggable,
           },
           on: {
             click(file) {
@@ -229,7 +232,6 @@
             confirm: () => context.emit('delete', selectedFile.value),
             input: val => showConfirmDeleteDialog.value = val,
           },
-          directives: {}
         }
 
         return <action-confirm-dialog {...dialogData} />
@@ -252,6 +254,8 @@
       }
 
       function renderDropZoneOverlay() {
+        if (!props.droppable) return ''
+
         return <drop-zone-overlay
             value={showDropZoneOverlay.value}
             vOn:input={val => showDropZoneOverlay.value = val}
@@ -264,23 +268,28 @@
             'file-explorer-panel': true,
             'file-explorer-panel--empty': !Array.isArray(props.files) || props.files.length === 0,
           },
-          directives: [
-            {
-              name: 'droppable',
-              value: true,
-              modifiers: {file: true}
+        }
+
+        if (props.droppable) {
+          Object.assign(elementData, {
+            directives: [
+              {
+                name: 'droppable',
+                value: true,
+                modifiers: {file: true}
+              }
+            ],
+            on: {
+              'drag-over': _.debounce(
+                  function () {
+                    showDropZoneOverlay.value = true
+                  }, 100, {
+                    leading: true,
+                    trailing: false,
+                  }
+              ),
             }
-          ],
-          on: {
-            'drag-over': _.debounce(
-                function () {
-                  showDropZoneOverlay.value = true
-                }, 100, {
-                  leading: true,
-                  trailing: false,
-                }
-            ),
-          }
+          })
         }
 
         return <div {...elementData}>
@@ -314,9 +323,9 @@
     ::v-deep .file-container {
       &--grid {
         display: grid;
-        grid-gap: 0.5%;
+        grid-gap: 0.33%;
         row-gap: 10px;
-        grid-template-columns: repeat(8, 12%);
+        grid-template-columns: repeat(12, 8%);
         text-align: center;
 
         > div {
