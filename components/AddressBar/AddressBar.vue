@@ -63,7 +63,7 @@
                     {
                       props.item.absolutePath !== '/'
                           ? <img width="12px" draggable="false"
-                                 src="/plugins/cloud-signage-plugin/assets/file-explorer-path-folder.svg"/>
+                                 src="/assets/images/file-explorer-path-folder.svg"/>
                           : ''
                     }
                     <span class="ml-1">{props.item.folderName}</span>
@@ -72,7 +72,7 @@
             },
             divider: () => {
               return (
-                  <img draggable="false" src="/plugins/cloud-signage-plugin/assets/file-explorer-path-separator.svg"/>
+                  <img draggable="false" src="/assets/images/file-explorer-path-separator.svg"/>
               )
             }
           },

@@ -87,7 +87,7 @@
                     <div class="fill-height" {...contextMenuListener}>
                       <div class="file-container--empty">
                         <div class="ta-center">
-                          <img draggable="false" src="/plugins/cloud-signage-plugin/assets/empty_folder.svg"
+                          <img draggable="false" src="/assets/images/empty_folder.svg"
                                width="15%"/>
                           <div class="file-container--empty__message">You haven't uploaded any content yet</div>
                           <div class="file-container--empty__message">Click '<span

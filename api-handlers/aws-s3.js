@@ -6,10 +6,10 @@ import md5 from 'md5'
 const CancelToken = axios.CancelToken
 
 function createAwsS3Handlers(options) {
-  const {apiBaseUrl, userNamespace} = options;
+  const {apiBaseUrl, namespace} = options;
 
   const axios = ax.create()
-  if (userNamespace) axios.defaults.headers.common['user'] = userNamespace;
+  if (namespace) axios.defaults.headers.common[namespace.key] = namespace.value;
 
   if (!apiBaseUrl) throw new Error('Missing apiBaseUrl in parameter object')
 
@@ -157,8 +157,6 @@ function createAwsS3Handlers(options) {
     uploadFile,
   }
 }
-
-import _ from 'lodash'
 
 class FileStreamChunkReader {
   constructor(reader, chunkSize = 1024 * 1024) {

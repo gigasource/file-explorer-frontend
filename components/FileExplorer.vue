@@ -312,8 +312,11 @@
   }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
   .file-explorer {
     background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
   }
 </style>
