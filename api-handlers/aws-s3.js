@@ -1,18 +1,15 @@
 import createCommonApiHandlers from './common'
-import forEach from 'lodash/forEach'
+import _ from 'lodash'
 import ax from 'axios'
-
-//TODO: replace this as this is a project-specific utility
-import FileStreamChunkReader from "../../components/utils/FileStreamChunkReader";
-import md5 from 'md5';
+import md5 from 'md5'
 
 const CancelToken = axios.CancelToken
 
 function createAwsS3Handlers(options) {
-  const {apiBaseUrl, userNamespace} = options;
+  const {apiBaseUrl, namespace} = options;
 
   const axios = ax.create()
-  if (userNamespace) axios.defaults.headers.common['user'] = userNamespace;
+  if (namespace) axios.defaults.headers.common[namespace.key] = namespace.value;
 
   if (!apiBaseUrl) throw new Error('Missing apiBaseUrl in parameter object')
 
@@ -22,7 +19,7 @@ function createAwsS3Handlers(options) {
     if (!files || files.length === 0) return
     const uploads = []
 
-    forEach(files, file => {
+    _.forEach(files, file => {
       uploads.push(file)
     })
 
@@ -158,6 +155,87 @@ function createAwsS3Handlers(options) {
     ...commonFunctions,
     uploadFiles,
     uploadFile,
+  }
+}
+
+class FileStreamChunkReader {
+  constructor(reader, chunkSize = 1024 * 1024) {
+    this._reader = reader
+    this._buffer = new Uint8ArrayWrapper(chunkSize)
+  }
+
+  read(onChunk, onCompleted) {
+    this._onChunk = onChunk
+    this._onCompleted = onCompleted
+    this._reader.read().then(this.processBytes.bind(this))
+  }
+
+  processBytes({done, value}) {
+    if (!done) {
+      this._buffer.push(value)
+      _.each(this._buffer.pullFromChunks(), this._onChunk)
+      this._reader.read().then(this.processBytes.bind(this))
+    } else {
+      this._buffer.flush()
+      _.each(this._buffer.pullFromChunks(), this._onChunk)
+      this._buffer.clear()
+      this._onCompleted()
+    }
+  }
+}
+class Uint8ArrayWrapper {
+  constructor(length) {
+    this._chunks = []
+    this._buffer = new Uint8Array(length)
+    this._maxLength = length
+    this._curLen = 0
+    this._remain = length
+  }
+
+  push(arr) {
+    if (!(arr instanceof Uint8Array) || arr.length === 0)
+      return
+
+    if (this._remain <= arr.length) {
+      const part1 = arr.slice(0, this._remain)
+      const part2 = arr.slice(this._remain, arr.length)
+      this._buffer.set(part1, this._curLen)
+      this._pushToChunks(this._buffer.slice(0, this._maxLength))
+      this._curLen = 0
+      this._remain = this._maxLength
+      if (part2.length)
+        this.push(part2)
+    } else {
+      this._buffer.set(arr, this._curLen)
+      this._curLen += arr.length
+      this._remain = this._maxLength - this._curLen
+    }
+  }
+
+  pullFromChunks() {
+    let rs = this._chunks
+    this._chunks = null
+    return rs
+  }
+
+  _pushToChunks(chunk) {
+    if (this._chunks === null) {
+      this._chunks = []
+    }
+    this._chunks.push(chunk)
+  }
+
+  flush() {
+    if (this._curLen) {
+      this._pushToChunks(this._buffer.slice(0, this._curLen))
+    }
+    this._curLen = 0
+    this._remain = this._maxLength
+  }
+
+  clear() {
+    this._buffer = null
+    this._chunks = null
   }
 }
 

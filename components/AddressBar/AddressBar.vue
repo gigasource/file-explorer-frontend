@@ -1,5 +1,7 @@
 <script>
   import {computed} from '@vue/composition-api'
+  import fileExplorerPathFolder from '../../assets/images/file-explorer-path-folder.svg'
+  import fileExplorerPathSeparator from '../../assets/images/file-explorer-path-separator.svg';
 
   export default {
     name: 'AddressBar',
@@ -63,7 +65,7 @@
                     {
                       props.item.absolutePath !== '/'
                           ? <img width="12px" draggable="false"
-                                 src="/plugins/cloud-signage-plugin/assets/file-explorer-path-folder.svg"/>
+                                 src={fileExplorerPathFolder}/>
                           : ''
                     }
                     <span class="ml-1">{props.item.folderName}</span>
@@ -72,7 +74,7 @@
             },
             divider: () => {
               return (
-                  <img draggable="false" src="/plugins/cloud-signage-plugin/assets/file-explorer-path-separator.svg"/>
+                  <img draggable="false" src={fileExplorerPathSeparator}/>
               )
             }
           },
