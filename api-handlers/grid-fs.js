@@ -41,7 +41,7 @@ function createGridFsHandlers(options) {
       inProgress: true,
       cancel: source.cancel,
       mimeType: file.type,
-      fileName: file.filename,
+      fileName: file.name,
     }
 
     function onUploadProgress(progress) {

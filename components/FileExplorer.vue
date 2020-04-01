@@ -295,7 +295,7 @@
             ))
             //fallback content
             || (
-                <div class="elevation-3 file-explorer">
+                <div class="elevation-3 vue-file-explorer">
                   {toolbarVNode}
                   {fileExplorerVNode}
                 </div>
@@ -312,9 +312,8 @@
   }
 </script>
 
-<style lang="scss" scoped>
-  .file-explorer {
-    background-color: #ffffff;
+<style lang="scss">
+  .vue-file-explorer {
     display: flex;
     flex-direction: column;
     height: 100%;

@@ -1,5 +1,5 @@
 <script>
-  import {ref, computed, onMounted} from '@vue/composition-api'
+  import {computed} from '@vue/composition-api'
   import {folderArrayToFolderParth, folderPathToFolderArray} from '../../utils/file-path'
 
   export default {
@@ -101,8 +101,6 @@
 
 <style scoped lang="scss">
   .folder-tree ::v-deep {
-    box-shadow: 4px 0 3px -2px rgba(0, 0, 0, 0.2);
-
     .g-treeview-item {
       border: 1px solid transparent;
       font-weight: bold;
