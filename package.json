@@ -11,6 +11,7 @@
     "@fortawesome/fontawesome-free": "^5.11.2",
     "axios": "^0.18.0",
     "lodash": "^4.17.11",
+    "md5": "^2.2.1",
     "pos-vue-framework": "github:gigasource/pos-vue-framework",
     "resolve-url-loader": "^3.1.0"
   },
