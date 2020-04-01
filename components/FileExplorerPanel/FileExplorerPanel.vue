@@ -9,6 +9,7 @@
   import {Droppable} from "pos-vue-framework";
   import DropZoneOverlay from "./DropZoneOverlay";
   import _ from 'lodash'
+  import emptyFolder from '../../assets/images/empty_folder.svg'
 
   export default {
     name: 'FileExplorerPanel',
@@ -87,7 +88,7 @@
                     <div class="fill-height" {...contextMenuListener}>
                       <div class="file-container--empty">
                         <div class="ta-center">
-                          <img draggable="false" src="/assets/images/empty_folder.svg"
+                          <img draggable="false" src={emptyFolder}
                                width="15%"/>
                           <div class="file-container--empty__message">You haven't uploaded any content yet</div>
                           <div class="file-container--empty__message">Click '<span

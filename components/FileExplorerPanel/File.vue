@@ -1,6 +1,8 @@
 <script>
-  import ContextMenu from "./ContextMenu";
-  import {Draggable} from "pos-vue-framework";
+  import ContextMenu from "./ContextMenu"
+  import {Draggable} from "pos-vue-framework"
+  import videoThumbGridItem from '../../assets/images/video-thumb-grid-item.svg'
+  import folderImage from '../../assets/images/folder-image.svg'
 
   export default {
     name: 'File',
@@ -20,11 +22,11 @@
         if (props.file.mimeType && props.file.mimeType.startsWith('image') && props.file.viewUrl) {
           return <img draggable="false" class="file-thumbnail" src={props.file.viewUrl}/>
         } else if (props.file.mimeType && props.file.mimeType.startsWith('video')) {
-          return <img class="file-icon" src="/assets/images/video-thumb-grid-item.svg"
+          return <img class="file-icon" src={videoThumbGridItem}
                       draggable="false"/>
         } else {
           if (props.file.isFolder) {
-            return <img class="file-icon" src="/assets/images/folder-image.svg"
+            return <img class="file-icon" src={folderImage}
                         draggable="false"/>
           } else {
             return <g-icon draggable="false" class="file-icon" color="blue">fas fa-file</g-icon>
