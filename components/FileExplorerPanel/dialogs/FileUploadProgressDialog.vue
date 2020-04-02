@@ -19,10 +19,10 @@
           </g-btn>
           <g-progress-circular v-else-if="uploadItem.inProgress" class="upload-item__progress--uploading" v-else size="25" color="#536DFE" :value="uploadItem.progress"/>
           <div v-else-if="uploadItem.success" class="upload-item__progress--finished">
-            <img alt src="/plugins/cloud-signage-plugin/assets/upload-completed.svg"/>
+            <img alt :src="uploadCompleted"/>
           </div>
           <div v-else-if="!uploadItem.success" class="upload-item__progress--failed">
-            <img alt src="/plugins/cloud-signage-plugin/assets/upload-failed.svg"/>
+            <img alt :src="uploadFailed"/>
           </div>
         </div>
       </div>
@@ -40,6 +40,9 @@
 
 <script>
   import ActionConfirmDialog from "./ActionConfirmDialog";
+  import uploadCompleted from '../../../assets/images/upload-completed.svg';
+  import uploadFailed from '../../../assets/images/upload-failed.svg';
+
   export default {
     name: "FileUploadProgressDialog",
     components: {ActionConfirmDialog},
@@ -57,6 +60,7 @@
     data() {
       return {
         showConfirmCancelUploadDialog: false,
+        uploadCompleted, uploadFailed
       }
     },
     computed: {

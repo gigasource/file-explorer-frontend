@@ -1,5 +1,5 @@
 <script>
-  import {ref, computed, onMounted} from '@vue/composition-api'
+  import {computed} from '@vue/composition-api'
   import {folderArrayToFolderParth, folderPathToFolderArray} from '../../utils/file-path'
 
   export default {

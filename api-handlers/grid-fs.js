@@ -1,34 +1,68 @@
 import createCommonApiHandlers from './common'
 import forEach from 'lodash/forEach'
-import axios from 'axios'
+import ax from 'axios'
+
 const CancelToken = axios.CancelToken
 
 function createGridFsHandlers(options) {
-  const {apiBaseUrl} = options;
+  const {apiBaseUrl, namespace} = options;
+
+  const axios = ax.create()
+  if (namespace) axios.defaults.headers.common[namespace.key] = namespace.value;
 
   if (!apiBaseUrl) throw new Error('Missing apiBaseUrl in parameter object')
 
   const commonHandlers = createCommonApiHandlers(options)
 
-  function uploadFiles(files, folderPath) {
-    if (!files || files.length === 0) return;
-    const uploadPromises = []
+  function uploadFiles(files, folderPath, uploadCompletedCallback) {
+    if (!files || files.length === 0) return
+    const uploads = []
 
     forEach(files, file => {
-      uploadPromises.push(uploadFile(file, folderPath))
+      uploads.push(file)
     })
 
-    return Promise.all(uploadPromises)
+    return new Promise(resolve => {
+      Promise.all(uploads.map(f => uploadFile(f, folderPath, uploadCompletedCallback)))
+          .then(uploadInfoObjects => resolve(uploadInfoObjects))
+    })
   }
 
-  async function uploadFile(file, folderPath) {
+  function uploadFile(file, folderPath, uploadCompletedCallback) {
     const apiUrl = `${apiBaseUrl}/files?folderPath=${folderPath}`
 
     const formData = new FormData()
     formData.append('file', file)
 
     const source = CancelToken.source()
-    return axios.post(apiUrl, formData, {cancelToken: source.token})
+
+    const upload = {
+      progress: 0,
+      inProgress: true,
+      cancel: source.cancel,
+      mimeType: file.type,
+      fileName: file.name,
+    }
+
+    function onUploadProgress(progress) {
+      upload.progress = Math.round(progress.loaded * 100 / progress.total)
+    }
+
+    axios.post(apiUrl, formData, {cancelToken: source.token, onUploadProgress})
+        .then(async () => {
+          upload.progress = 100
+          upload.success = true
+        })
+        .catch(() => {
+          upload.progress = 0
+          upload.success = false
+        })
+        .finally(() => {
+          upload.inProgress = false
+          uploadCompletedCallback()
+        })
+
+    return upload
   }
 
   function insertViewUrl(files) {
