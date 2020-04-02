@@ -1,5 +1,5 @@
 {
-  "name": "file-explorer",
+  "name": "vue-file-explorer",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -7,11 +7,14 @@
     "build": "vue-cli-service build"
   },
   "main": "components/FileExplorer.vue",
+  "peerDependencies": {
+    "pos-vue-framework": "github:gigasource/pos-vue-framework"
+  },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.11.2",
     "axios": "^0.18.0",
     "lodash": "^4.17.11",
-    "pos-vue-framework": "github:gigasource/pos-vue-framework",
+    "md5": "^2.2.1",
     "resolve-url-loader": "^3.1.0"
   },
   "devDependencies": {
