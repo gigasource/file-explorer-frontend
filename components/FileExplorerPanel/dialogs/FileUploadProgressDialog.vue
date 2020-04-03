@@ -95,6 +95,7 @@
       cancelAllUploads() {
         this.uploadingItems.forEach(uploadItem => uploadItem.cancel())
         this.$emit('update:uploadingItems', [])
+        this.$emit('input', false)
       },
       isUploading() {
         return this.uploadingItems.find(item => item.inProgress)
@@ -104,6 +105,7 @@
           this.showConfirmCancelUploadDialog = true
         } else {
           this.$emit('update:uploadingItems', [])
+          this.$emit('input', false)
         }
       }
     }
