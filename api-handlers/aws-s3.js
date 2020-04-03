@@ -70,7 +70,7 @@ function createAwsS3Handlers(options) {
           upload.progress = 0
           upload.success = false
         })
-        .finally((response) => {
+        .finally(() => {
           upload.inProgress = false
           uploadCompletedCallback(responseData)
         })
