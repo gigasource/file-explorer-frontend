@@ -50,6 +50,7 @@
             closeOnContentClick: true,
             absolute: true,
             contentFillWidth: false,
+            minWidth: 'initial',
           },
           scopedSlots: {
             activator: ({toggleContent: toggleContextMenu}) => {
