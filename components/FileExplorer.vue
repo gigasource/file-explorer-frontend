@@ -7,6 +7,7 @@
   import {Fragment} from 'vue-fragment'
   import FolderTree from './FolderTree/FolderTree'
   import {folderArrayToFolderParth, folderPathToFolderArray} from '../utils/file-path'
+  import _openUploadFileDialog from '../api-handlers/openUploadFileDialog';
 
   export default {
     name: 'FileExplorer',
@@ -95,15 +96,7 @@
       }
 
       function openUploadFileDialog() {
-        const input = document.createElement('input')
-        input.type = 'file'
-        input.accept = '*'
-        input.multiple = true
-        input.addEventListener('change', e => uploadFiles(e.target.files));
-        document.body.appendChild(input)
-        input.style.display = 'none'
-        input.click()
-        input.parentNode.removeChild(input)
+        _openUploadFileDialog({ mimeType: "*", multiple: true }, uploadFiles)
       }
 
       async function onNewFolder() {
