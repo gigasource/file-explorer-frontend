@@ -58,12 +58,13 @@ function createAwsS3Handlers(options) {
       upload.progress = Math.round(progress.loaded * 100 / progress.total)
     }
 
+    let responseData
     axios.post(uploadUrl, formData, {cancelToken: source.token, onUploadProgress})
         .then(async (response) => {
           upload.progress = 100
           upload.success = true
           await createFileMetadata(file, folderPath, generatedFileName)
-          return response
+          responseData = response
         })
         .catch(() => {
           upload.progress = 0
@@ -71,7 +72,7 @@ function createAwsS3Handlers(options) {
         })
         .finally((response) => {
           upload.inProgress = false
-          uploadCompletedCallback(response)
+          uploadCompletedCallback(responseData)
         })
 
     return upload

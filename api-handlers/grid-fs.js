@@ -48,11 +48,12 @@ function createGridFsHandlers(options) {
       upload.progress = Math.round(progress.loaded * 100 / progress.total)
     }
 
+    let responseData
     axios.post(apiUrl, formData, {cancelToken: source.token, onUploadProgress})
         .then(async (response) => {
           upload.progress = 100
           upload.success = true
-          return response
+          responseData = response
         })
         .catch(() => {
           upload.progress = 0
@@ -60,7 +61,7 @@ function createGridFsHandlers(options) {
         })
         .finally((response) => {
           upload.inProgress = false
-          uploadCompletedCallback(response)
+          uploadCompletedCallback(responseData)
         })
 
     return upload
