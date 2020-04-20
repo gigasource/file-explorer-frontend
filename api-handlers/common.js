@@ -49,6 +49,10 @@ function createCommonApiHandlers(options) {
     await axios.delete(apiUrl);
   }
 
+  async function deleteFileByPath(filePath) {
+    await axios.delete(`${apiBaseUrl}/filePaths/${filePath}`);
+  }
+
   async function pasteFile(folderPath, fileInClipboard) {
     const id = fileInClipboard._id;
     const apiUrl = `${apiBaseUrl}/file-metadata/move/${id}`;
@@ -63,6 +67,7 @@ function createCommonApiHandlers(options) {
     getFolderTree,
     renameFile,
     deleteFile,
+    deleteFileByPath,
     pasteFile,
   }
 }
