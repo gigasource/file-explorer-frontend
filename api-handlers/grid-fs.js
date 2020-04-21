@@ -95,6 +95,8 @@ function createGridFsHandlers(options) {
   }
 
   return {
+    insertViewUrl,
+    insertDownloadUrl,
     getFilesInPath,
     ...commonFunctions,
     uploadFiles,
