@@ -1,6 +1,8 @@
 let propertyMappings = {};
 
 function transformInternal(externalObject) {
+  if (!externalObject || typeof externalObject !== 'object') return externalObject;
+
   function transformObject(object) {
     const internalObject = {}
 
@@ -28,6 +30,8 @@ function setPropertyMappings(mappings) {
 }
 
 function transformExternal(internalObject) {
+  if (!internalObject || typeof internalObject !== 'object') return internalObject;
+
   function transformObject(obj) {
     const externalObject = {};
     Reflect.ownKeys(obj).forEach(originProp => {
