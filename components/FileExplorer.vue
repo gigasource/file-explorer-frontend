@@ -48,6 +48,8 @@
         btnNewFile: 'btn-new-file',
         btnNewFolder: 'btn-new-folder',
         searchBar: 'search-bar',
+        prepend: 'toolbar-prepend',
+        append: 'toolbar-append',
       }
       const fileExplorerPanelSlots = {
         contextMenu: 'context-menu',

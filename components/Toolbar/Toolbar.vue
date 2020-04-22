@@ -182,6 +182,7 @@
 
       const renderToolbar = () => {
         return <div class="file-explorer__toolbar">
+          {context.slots[props.slotNames.prepend] && context.slots[props.slotNames.prepend]()}
           {renderUpButton()}
           {renderViewMode()}
           {renderFileSort()}
@@ -190,6 +191,7 @@
           {renderSearchBar()}
           {renderNewFolderButton()}
           {renderNewFileButton()}
+          {context.slots[props.slotNames.append] && context.slots[props.slotNames.append]()}
         </div>
       }
 
