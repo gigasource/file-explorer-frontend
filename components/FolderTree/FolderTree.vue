@@ -12,7 +12,7 @@
     },
     setup(props, context) {
       function folderPathToTreePath(folderPath) {
-        if (folderPath === '/') return 'folders.0'
+        if (folderPath === '/' || !props.folderTree) return 'folders.0'
         if (!folderPath.endsWith('/')) folderPath += '/'
 
         let treePath = 'folders.0';
