@@ -5,7 +5,7 @@ import ax from 'axios'
 const CancelToken = axios.CancelToken
 
 function createGridFsHandlers(options) {
-  const {apiBaseUrl, namespace} = options;
+  const {apiBaseUrl, namespace, imageThumbnailSize} = options;
 
   const axios = ax.create()
   if (namespace) axios.defaults.headers.common[namespace.key] = namespace.value;
@@ -72,7 +72,16 @@ function createGridFsHandlers(options) {
 
     return files.map(file => ({
       ...file,
-      viewUrl: `${apiBaseUrl}/files/view/${file.folderPath}${file.fileName}`,
+      viewUrl: `${apiBaseUrl}/files/view${file.folderPath}${file.fileName}`,
+    }))
+  }
+
+  function insertThumbnailUrl(files, width, height) {
+    if (!files) return files
+
+    return files.map(file => ({
+      ...file,
+      thumbnailUrl: `${apiBaseUrl}/files/view${file.folderPath}${file.fileName}?w=${width}&h=${height}`,
     }))
   }
 
@@ -81,7 +90,7 @@ function createGridFsHandlers(options) {
 
     return files.map(file => ({
       ...file,
-      downloadUrl: `${apiBaseUrl}/files/download/${file.folderPath}${file.fileName}`,
+      downloadUrl: `${apiBaseUrl}/files/download${file.folderPath}${file.fileName}`,
     }))
   }
 
@@ -91,6 +100,10 @@ function createGridFsHandlers(options) {
     let filesInFolder = await getFiles(folderPath)
     filesInFolder = insertViewUrl(filesInFolder)
     filesInFolder = insertDownloadUrl(filesInFolder)
+
+    if (!isNaN(imageThumbnailSize.width) && !isNaN(imageThumbnailSize.height))
+      filesInFolder = insertThumbnailUrl(filesInFolder, imageThumbnailSize.width, imageThumbnailSize.height)
+
     return filesInFolder
   }
 

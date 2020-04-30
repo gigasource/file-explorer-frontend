@@ -20,8 +20,10 @@
     },
     setup(props, context) {
       function renderFileIcon() {
-        if (props.file.mimeType && props.file.mimeType.startsWith('image') && props.file.viewUrl) {
-          return <img draggable="false" class="file-thumbnail" src={props.file.viewUrl}/>
+        const fileIconSrc = props.file.thumbnailUrl || props.file.viewUrl
+
+        if (props.file.mimeType && props.file.mimeType.startsWith('image') && fileIconSrc) {
+          return <img draggable="false" class="file-thumbnail" src={fileIconSrc}/>
         } else if (props.file.mimeType && props.file.mimeType.startsWith('video')) {
           return <img class="file-icon" src={videoThumbGridItem}
                       draggable="false"/>
