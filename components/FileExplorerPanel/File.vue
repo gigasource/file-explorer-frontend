@@ -16,6 +16,7 @@
       },
       viewMode: String,
       draggable: Boolean,
+      fileNameDisplayMaxLength: Number,
     },
     setup(props, context) {
       function renderFileIcon() {
@@ -35,32 +36,20 @@
       }
 
       function renderFileName() {
-        /*let fileName = props.file.fileName;
+        let fileName = props.file.fileName
 
-        const fileNameEditEventListeners = {
-          on: {
-            blur() {
-              context.emit('updateFileName', props.file, fileName);
-              isEditingName.value = false;
-            }
-          }
-        }*/
+        if (fileName.length > props.fileNameDisplayMaxLength) {
+          const numberOfLeftChars = Math.ceil(props.fileNameDisplayMaxLength / 2)
+          const numberOfRightChars = Math.floor(props.fileNameDisplayMaxLength / 2)
+
+          fileName = fileName.substring(0, numberOfLeftChars) + '...' + fileName.substring(fileName.length - numberOfRightChars)
+        }
 
         return (
             <span class="file-name">
-              {props.file.fileName}
+              {fileName}
             </span>
         )
-
-        /*else return (
-            <div class="file-name-edit">
-              <g-text-field
-                  outlined vFocus dense
-                  {...fileNameEditEventListeners}
-                  value={fileName}
-                  vOn:input={newName => fileName = newName}/>
-            </div>
-        )*/
       }
 
       const renderFile = () => {

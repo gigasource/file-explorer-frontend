@@ -34,6 +34,7 @@
       },
       draggable: Boolean,
       droppable: Boolean,
+      fileNameDisplayMaxLength: Number,
     },
     setup(props, context) {
       const selectedFile = ref(null)
@@ -129,6 +130,7 @@
             file: f,
             viewMode: props.viewMode,
             draggable: props.draggable,
+            fileNameDisplayMaxLength: props.fileNameDisplayMaxLength,
           },
           on: {
             click(file) {

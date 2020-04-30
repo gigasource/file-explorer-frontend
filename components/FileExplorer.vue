@@ -38,6 +38,10 @@
         type: Boolean,
         default: true,
       },
+      fileNameDisplayMaxLength: {
+        type: Number,
+        default: 15,
+      }
     },
     setup(props, context) {
       // slot name for children components
@@ -231,6 +235,7 @@
             showFileUploadProgressDialog: showFileUploadProgressDialog.value,
             draggable: props.draggable,
             droppable: props.droppable,
+            fileNameDisplayMaxLength: props.fileNameDisplayMaxLength,
           },
           on: {
             'update:fileInClipboard': file => fileInClipboard.value = file,
