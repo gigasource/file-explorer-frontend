@@ -10,8 +10,11 @@ function createCommonApiHandlers(options) {
 
   if (!apiBaseUrl) throw new Error('Missing apiBaseUrl in parameter object')
 
-  async function createNewFolder(folderPath, newFolderName = 'New Folder') {
-    await axios.post(`${apiBaseUrl}/folders`, {
+  async function createNewFolder(folderPath, newFolderName = 'New Folder', ignoreDuplicate) {
+    let apiUrl = `${apiBaseUrl}/folders`
+    if (ignoreDuplicate) apiUrl += '?ignoreDuplicate=true'
+
+    await axios.post(apiUrl, {
       folderName: newFolderName,
       folderPath: folderPath,
     })

@@ -15,7 +15,7 @@ function createAwsS3Handlers(options) {
 
   const commonHandlers = createCommonApiHandlers(options)
 
-  function uploadFiles(files, folderPath, uploadCompletedCallback) {
+  function uploadFiles(files, folderPath, uploadCompletedCallback, ignoreDuplicate) {
     if (!files || files.length === 0) return
     const uploads = []
 
@@ -23,15 +23,14 @@ function createAwsS3Handlers(options) {
       uploads.push(file)
     })
 
-    return new Promise(resolve => {
-      Promise.all(uploads.map(f => uploadFile(f, folderPath, uploadCompletedCallback)))
-          .then(uploadInfoObjects => resolve(uploadInfoObjects))
-    })
+    return uploads.map(f => uploadFile(f, folderPath, uploadCompletedCallback, ignoreDuplicate))
   }
 
-  async function uploadFile(file, folderPath, uploadCompletedCallback) {
+  async function uploadFile(file, folderPath, uploadCompletedCallback, ignoreDuplicate) {
     // Get S3 upload URL & upload data to append into FormData
-    const apiUrl = `${apiBaseUrl}/file-upload-url?fileName=${file.name}&folderPath=${folderPath}`
+    let apiUrl = `${apiBaseUrl}/file-upload-url?fileName=${file.name}&folderPath=${folderPath}`
+    if (ignoreDuplicate) apiUrl += '&ignoreDuplicate=true'
+
     const response = await axios.get(apiUrl)
 
     const {generatedFileName, originalFileName, fileDownloadUrl, awsS3Data} = response.data

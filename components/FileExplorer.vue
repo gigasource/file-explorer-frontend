@@ -94,19 +94,19 @@
         }
       }
 
-      async function uploadFiles(files) {
-        const uploads = await props.apiHandler.uploadFiles(files, path.value, refresh)
+      function uploadFiles(files) {
+        const uploads = props.apiHandler.uploadFiles(files, path.value, refresh, true)
 
         showFileUploadProgressDialog.value = true
         uploadingItems.value = uploadingItems.value.concat(uploads)
       }
 
       function openUploadFileDialog() {
-        _openUploadFileDialog({ mimeType: "*", multiple: true }, uploadFiles)
+        _openUploadFileDialog({mimeType: "*", multiple: true}, uploadFiles)
       }
 
       async function onNewFolder() {
-        await props.apiHandler.createNewFolder(path.value)
+        await props.apiHandler.createNewFolder(path.value, 'New Folder', true)
         await refresh()
       }
 
