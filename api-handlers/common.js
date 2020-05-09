@@ -64,6 +64,12 @@ function createCommonApiHandlers(options) {
     await axios.put(apiUrl, requestBody);
   }
 
+  async function checkFileExisted(folderPath, fileName) {
+    if (!folderPath.startsWith('/')) folderPath += '/'
+    const apiUrl = `${apiBaseUrl}/file-existed?filePath=${folderPath + fileName}`;
+    return (await axios.get(apiUrl)).data.existed
+  }
+
   return {
     createNewFolder,
     getFilesInPath,
@@ -72,6 +78,7 @@ function createCommonApiHandlers(options) {
     deleteFile,
     deleteFileByPath,
     pasteFile,
+    checkFileExisted,
   }
 }
 
