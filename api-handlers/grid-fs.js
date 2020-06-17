@@ -5,7 +5,7 @@ import ax from 'axios'
 const CancelToken = axios.CancelToken
 
 function createGridFsHandlers(options) {
-  const {apiBaseUrl, namespace, imageThumbnailSize} = options;
+  const {apiBaseUrl, namespace, imageThumbnailSize = {}} = options;
 
   const axios = ax.create()
   if (namespace) axios.defaults.headers.common[namespace.key] = namespace.value;
