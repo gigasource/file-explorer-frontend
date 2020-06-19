@@ -25,9 +25,10 @@ function createGridFsHandlers(options) {
     return uploads.map(f => uploadFile(f, folderPath, uploadCompletedCallback, ignoreDuplicate))
   }
 
-  function uploadFile(file, folderPath, uploadCompletedCallback, ignoreDuplicate) {
+  function uploadFile(file, folderPath, uploadCompletedCallback, ignoreDuplicate, overwrite) {
     let apiUrl = `${apiBaseUrl}/files?folderPath=${folderPath}`
     if (ignoreDuplicate) apiUrl += '&ignoreDuplicate=true'
+    if (overwrite) apiUrl += '&overwrite=true'
 
     const formData = new FormData()
     formData.append('file', file)
