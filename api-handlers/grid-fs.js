@@ -14,7 +14,7 @@ function createGridFsHandlers(options) {
 
   const commonHandlers = createCommonApiHandlers(options)
 
-  function uploadFiles(files, folderPath, uploadCompletedCallback, ignoreDuplicate) {
+  function uploadFiles(files, folderPath, uploadCompletedCallback, ignoreDuplicate, overwrite) {
     if (!files || files.length === 0) return
     const uploads = []
 
@@ -22,7 +22,7 @@ function createGridFsHandlers(options) {
       uploads.push(file)
     })
 
-    return uploads.map(f => uploadFile(f, folderPath, uploadCompletedCallback, ignoreDuplicate))
+    return uploads.map(f => uploadFile(f, folderPath, uploadCompletedCallback, ignoreDuplicate, overwrite))
   }
 
   function uploadFile(file, folderPath, uploadCompletedCallback, ignoreDuplicate, overwrite) {
