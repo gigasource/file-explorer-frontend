@@ -174,6 +174,9 @@
             cut: file => {
               context.emit('cut', file)
             },
+            copy: file => {
+              context.emit('copy', file)
+            },
             paste: () => {
               context.emit('paste')
             },

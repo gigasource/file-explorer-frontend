@@ -200,13 +200,20 @@
       function renderFileExplorerPanel() {
         function onCut(file) {
           fileInClipboard.value = file
+          fileInClipboard.type = 'cut'
+        }
+
+        function onCopy(file) {
+          fileInClipboard.value = file
+          fileInClipboard.type = 'copy'
         }
 
         async function onPaste() {
           if (!fileInClipboard.value) return
 
           if (fileInClipboard.value.folderPath !== path.value) {
-            await props.apiHandler.pasteFile(path.value, fileInClipboard.value)
+            if (fileInClipboard.type === 'cut') await props.apiHandler.moveFile(path.value, fileInClipboard.value)
+            else if (fileInClipboard.type === 'copy') await props.apiHandler.cloneFile(path.value, fileInClipboard.value)
             await refresh()
           }
           fileInClipboard.value = null
@@ -247,6 +254,7 @@
               context.emit('open', file)
             },
             cut: onCut,
+            copy: onCopy,
             paste: onPaste,
             delete: onDelete,
             rename: onRename,

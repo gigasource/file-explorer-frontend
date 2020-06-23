@@ -56,12 +56,20 @@ function createCommonApiHandlers(options) {
     await axios.delete(`${apiBaseUrl}/filePaths/${filePath}`);
   }
 
-  async function pasteFile(folderPath, fileInClipboard) {
+  async function moveFile(folderPath, fileInClipboard) {
     const id = fileInClipboard._id;
     const apiUrl = `${apiBaseUrl}/file-metadata/move/${id}`;
-    const requestBody = {newFolderPath: folderPath}
+    const requestBody = {newFolderPath: folderPath};
 
     await axios.put(apiUrl, requestBody);
+  }
+
+  async function cloneFile(folderPath, fileInClipboard) {
+    const id = fileInClipboard._id;
+    const apiUrl = `${apiBaseUrl}/files/clone/${id}`;
+    const requestBody = {newFolderPath: folderPath};
+
+    await axios.post(apiUrl, requestBody);
   }
 
   async function checkFileExisted(folderPath, fileName) {
@@ -77,8 +85,10 @@ function createCommonApiHandlers(options) {
     renameFile,
     deleteFile,
     deleteFileByPath,
-    pasteFile,
+    pasteFile: moveFile,
+    moveFile,
     checkFileExisted,
+    cloneFile,
   }
 }
 
