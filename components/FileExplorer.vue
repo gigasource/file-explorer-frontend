@@ -64,6 +64,7 @@
       }
 
       const fileInClipboard = ref(null)
+      const contextAction = ref('')
       const viewMode = ref(props.viewMode)
       const fileSort = ref('az')
       const searchText = ref('')
@@ -198,25 +199,30 @@
       }
 
       function renderFileExplorerPanel() {
+
         function onCut(file) {
           fileInClipboard.value = file
-          fileInClipboard.type = 'cut'
+          contextAction.value = 'cut'
         }
 
         function onCopy(file) {
           fileInClipboard.value = file
-          fileInClipboard.type = 'copy'
+          contextAction.value = 'copy'
         }
 
         async function onPaste() {
           if (!fileInClipboard.value) return
 
-          if (fileInClipboard.value.folderPath !== path.value) {
-            if (fileInClipboard.type === 'cut') await props.apiHandler.moveFile(path.value, fileInClipboard.value)
-            else if (fileInClipboard.type === 'copy') await props.apiHandler.cloneFile(path.value, fileInClipboard.value)
+          if (contextAction.value === 'copy') {
+            await props.apiHandler.cloneFile(path.value, fileInClipboard.value)
             await refresh()
+          } else if (contextAction.value === 'cut') {
+            if (fileInClipboard.value.folderPath !== path.value) {
+              await props.apiHandler.moveFile(path.value, fileInClipboard.value)
+              await refresh()
+            }
+            fileInClipboard.value = null
           }
-          fileInClipboard.value = null
         }
 
         async function onDelete(file) {
@@ -238,6 +244,7 @@
             appendContextOptions: props.appendContextOptions,
             viewMode: viewMode.value,
             fileInClipboard: fileInClipboard.value,
+            contextAction: contextAction.value,
             uploadingItems: uploadingItems.value,
             showFileUploadProgressDialog: showFileUploadProgressDialog.value,
             draggable: props.draggable,

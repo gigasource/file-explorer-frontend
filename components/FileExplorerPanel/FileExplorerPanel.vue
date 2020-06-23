@@ -27,6 +27,7 @@
       appendContextOptions: Array,
       viewMode: String,
       fileInClipboard: Object,
+      contextAction: String,
       showFileUploadProgressDialog: Boolean,
       uploadingItems: {
         type: Array,
@@ -120,7 +121,7 @@
       function renderFile(f, toggleContextMenu) {
         const fileElData = {
           class: {
-            'file--cut': props.fileInClipboard && f && props.fileInClipboard._id === f._id,
+            'file--cut': props.fileInClipboard && f && props.fileInClipboard._id === f._id && props.contextAction === 'cut',
           },
           scopedSlots: {
             default: context.slots[props.slotNames.file]

@@ -50,7 +50,7 @@
               <div {...createOptionData('newFile', null)}>Upload file</div>
               <div {...createOptionData('newFolder', {'border': true})}>New folder</div>
               <div {...createOptionData('cut', null, !props.file)}>Cut</div>
-              <div {...createOptionData('copy', null, !props.file)}>Copy</div>
+              <div {...createOptionData('copy', null, !props.file || props.file.isFolder)}>Copy</div>
               <div {...createOptionData('paste', null, !props.fileInClipboard || disablePaste.value)}>Paste</div>
               <div {...createOptionData('delete', null, !props.file)}>Delete</div>
               <div {...createOptionData('rename', null, !props.file)}>Rename</div>
