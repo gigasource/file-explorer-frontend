@@ -69,7 +69,8 @@ function createCommonApiHandlers(options) {
     const apiUrl = `${apiBaseUrl}/files/clone/${id}`;
     const requestBody = {newFolderPath: folderPath};
 
-    await axios.post(apiUrl, requestBody);
+    const response = await axios.post(apiUrl, requestBody);
+    return response.data;
   }
 
   async function checkFileExisted(folderPath, fileName) {
