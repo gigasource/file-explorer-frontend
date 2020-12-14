@@ -1,5 +1,5 @@
 <template>
-  <g-dialog :value="value" persistent width="30%">
+  <g-dialog v-model="modelValue" persistent width="30%">
     <g-card elevation="16">
       <g-card-title class="dialog">
         {{dialogTitle}}
@@ -21,7 +21,7 @@
     name: "ActionConfirmDialog",
     props: {
       file: Object,
-      value: Boolean,
+      modelValue: Boolean,
       dialogTitle: String,
       dialogText: String,
       confirmActionText: {
@@ -35,7 +35,7 @@
     },
     methods: {
       close() {
-        this.$emit('input', false)
+        this.$emit('update:modelValue', false)
       },
       doAction() {
         this.$emit('confirm', true)

@@ -1,5 +1,5 @@
 <script>
-  import {computed} from '@vue/composition-api'
+  import { computed } from 'vue'
   import fileExplorerPathFolder from '../../assets/images/file-explorer-path-folder.svg'
   import fileExplorerPathSeparator from '../../assets/images/file-explorer-path-separator.svg';
 
@@ -34,7 +34,7 @@
         return paths
       });
 
-      function render() {
+      function renderFn() {
         const updatePath = absolutePath => context.emit('update:path', absolutePath)
 
         if (context.slots.default) {
@@ -45,56 +45,52 @@
           class: {
             'address-bar': true,
           },
-          scopedSlots: {
-            item: props => {
-              const itemData = {
-                class: {
-                  'breadcrumb-item': true,
-                  'breadcrumb-item--blurred': props.item.length > 1 && props.item.index < props.item.length - 1,
-                },
-                on: {
-                  click: () => {
-                    if (props.item.index === props.item.length - 1) return
-                    updatePath(props.item.absolutePath)
-                  }
-                }
-              }
-
-              return (
-                  <div {...itemData}>
-                    {
-                      props.item.absolutePath !== '/'
-                          ? <img width="12px" draggable="false"
-                                 src={fileExplorerPathFolder}/>
-                          : ''
-                    }
-                    <span class="ml-1">{props.item.folderName}</span>
-                  </div>
-              )
-            },
-            divider: () => {
-              return (
-                  <img draggable="false" src={fileExplorerPathSeparator}/>
-              )
-            }
-          },
-          props: {
-            items: breadcrumbs.value,
-            divider: props.divider
-          }
+          items: breadcrumbs.value,
+          divider: props.divider
         }
 
+        const elementSlots = {
+          item: props => {
+            const itemData = {
+              class: {
+                'breadcrumb-item': true,
+                'breadcrumb-item--blurred': props.item.length > 1 && props.item.index < props.item.length - 1,
+              },
+              onClick: () => {
+                if (props.item.index === props.item.length - 1) return
+                updatePath(props.item.absolutePath)
+              }
+            }
+
+            return (
+                <div {...itemData}>
+                  {
+                    props.item.absolutePath !== '/'
+                        ? <img width="12px" draggable="false"
+                               src={fileExplorerPathFolder}/>
+                        : ''
+                  }
+                  <span class="ml-1">{props.item.folderName}</span>
+                </div>
+            )
+          },
+          divider: () => {
+            return (
+                <img draggable="false" src={fileExplorerPathSeparator}/>
+            )
+          }
+        }
         return context.slots.default
             ? context.slots.default()
-            : <g-breadcrumbs {...elementData}/>
+            : <g-breadcrumbs {...elementData} vSlots={elementSlots}/>
       }
 
       return {
-        render
+        renderFn
       }
     },
     render() {
-      return this.render()
+      return this.renderFn()
     }
   }
 </script>

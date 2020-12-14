@@ -1,19 +1,28 @@
 <script>
   import _ from 'lodash';
+  import {getCurrentInstance, withScopeId} from 'vue'
 
   export default {
     name: "Search",
     props: {
       placeholder: String,
-      value: String
+      modelValue: String
     },
     setup(props, context) {
       const onSearchInput = _.debounce(searchText => context.emit('input', searchText), 250)
 
       const renderSearchField = function () {
         const fallbackContent = (
-            <g-text-field class="mx-1 search row-flex align-items-center br-2 pa-1" type="text" prependInnerIcon="search"
-                          solo flat value={props.searchText} vOn:input={onSearchInput} placeholder={props.placeholder}/>
+            <g-text-field class="mx-1 search row-flex align-items-center br-2 pa-1"
+                {...{
+                  type: "text",
+                  prependInnerIcon: "search",
+                  solo: true,
+                  flat: true,
+                  modelValue: props.searchText,
+                  'onUpdate:modelValue':onSearchInput,
+                  placeholder: props.placeholder
+                }}/>
         );
 
         return (context.slots.default && context.slots.default({
@@ -29,7 +38,8 @@
       }
     },
     render() {
-      return this.renderSearchField();
+      const { type } = getCurrentInstance()
+      return withScopeId(type.__scopeId)(this.renderSearchField)();
     }
   }
 </script>

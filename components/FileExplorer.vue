@@ -1,6 +1,6 @@
 <script>
   import _ from 'lodash'
-  import {ref, watch, computed} from '@vue/composition-api'
+  import {ref, watch, computed, getCurrentInstance, withScopeId} from 'vue'
   import Toolbar from './Toolbar/Toolbar'
   import AddressBar from './AddressBar/AddressBar'
   import FileExplorerPanel from './FileExplorerPanel/FileExplorerPanel'
@@ -147,8 +147,7 @@
 
         return (
             <toolbar {...{
-              scopedSlots: context.slots,
-              props: {
+              //props
                 selectedViewMode: viewMode.value,
                 selectedSort: fileSort.value,
                 viewMode: viewMode.value,
@@ -159,20 +158,18 @@
                 addressBarDivider: props.addressBarDivider,
                 hideComponents: props.hideComponents,
                 addressBarVNode,
-              },
-              on: {
-                'update:viewMode': mode => {
+              //events
+                'onUpdate:viewMode': mode => {
                   viewMode.value = mode
                   context.emit('update:viewMode', mode)
                 },
-                'update:sort': sort => fileSort.value = sort,
-                'update:searchText': e => searchText.value = e,
-                'update:path': p => path.value = p,
-                newFile: openUploadFileDialog,
-                newFolder: onNewFolder,
-                up: onUp,
-              }
-            }}/>
+                'onUpdate:sort': sort => fileSort.value = sort,
+                'onUpdate:searchText': e => searchText.value = e,
+                'onUpdate:path': p => path.value = p,
+                onNewFile: openUploadFileDialog,
+                onNewFolder,
+                onUp,
+            }} vSlots={context.slots}/>
         )
       }
 
@@ -183,18 +180,13 @@
           class: {
             'ml-2': true,
           },
-          props: {
-            path: path.value,
-            divider: props.addressBarDivider,
-          },
-          on: {
-            'update:path': p => path.value = p,
-          },
-          scopedSlots: {
-            default: context.slots[addressBarSlots.addressBar],
-          },
+          path: path.value,
+          divider: props.addressBarDivider,
+          'onUpdate:path': p => path.value = p,
         }
 
+        if(context.slots[addressBarSlots.addressBar])
+          return <address-bar {...elementData}>{context.slots[addressBarSlots.addressBar]()}</address-bar>
         return <address-bar {...elementData}/>
       }
 
@@ -236,8 +228,7 @@
         }
 
         const elementData = {
-          scopedSlots: context.slots,
-          props: {
+          ...{//props
             files: activeFiles.value,
             path: path.value,
             slotNames: fileExplorerPanelSlots,
@@ -251,27 +242,27 @@
             droppable: props.droppable,
             fileNameDisplayMaxLength: props.fileNameDisplayMaxLength,
           },
-          on: {
-            'update:fileInClipboard': file => fileInClipboard.value = file,
-            'removeUploadItem': itemIndex => uploadingItems.value.splice(itemIndex, 1),
-            'update:uploadingItems': items => uploadingItems.value = items,
-            'update:showFileUploadProgressDialog': value => showFileUploadProgressDialog.value = value,
-            open: file => {
+          ...{//events
+            'onUpdate:fileInClipboard': file => fileInClipboard.value = file,
+            'onRemoveUploadItem': itemIndex => uploadingItems.value.splice(itemIndex, 1),
+            'onUpdate:uploadingItems': items => uploadingItems.value = items,
+            'onUpdate:showFileUploadProgressDialog': value => showFileUploadProgressDialog.value = value,
+            onOpen: file => {
               openFile(file)
               context.emit('open', file)
             },
-            cut: onCut,
-            copy: onCopy,
-            paste: onPaste,
-            delete: onDelete,
-            rename: onRename,
-            newFile: openUploadFileDialog,
-            newFolder: onNewFolder,
-            uploadFiles
+            onCut,
+            onCopy,
+            onPaste,
+            onDelete,
+            onRename,
+            onNewFile: openUploadFileDialog,
+            onNewFolder: onNewFolder,
+            onUploadFiles: uploadFiles
           }
         }
 
-        return <file-explorer-panel {...elementData}/>
+        return <file-explorer-panel {...elementData} vSlots={context.slots}/>
       }
 
       function renderFolderTree() {
@@ -283,31 +274,24 @@
         }
 
         const elementData = {
-          props: {
-            folders,
-            folderTree: folderTree.value,
-            path: path.value,
-          },
-          on: {
-            folderSelected: onFolderSelected
-          }
+          folders,
+          folderTree: folderTree.value,
+          path: path.value,
+          onFolderSelected
         }
 
         return <folder-tree {...elementData} />
       }
 
-      const render = () => {
+      const renderFn = () => {
         const addressBarVNode = renderAddressBar()
         const toolbarVNode = renderToolbar(addressBarVNode)
         const fileExplorerVNode = renderFileExplorerPanel()
         const folderTreeVNode = renderFolderTree()
 
-        return (context.slots.components
-            && (
-                <fragment>
-                  {context.slots.components({addressBarVNode, toolbarVNode, fileExplorerVNode, folderTreeVNode})}
-                </fragment>
-            ))
+        return (context.slots.components &&
+                  context.slots.components({addressBarVNode, toolbarVNode, fileExplorerVNode, folderTreeVNode})
+            )
             //fallback content
             || (
                 <div class="elevation-3 vue-file-explorer">
@@ -318,11 +302,12 @@
       }
 
       return {
-        render, openUploadFileDialog
+        renderFn, openUploadFileDialog
       }
     },
     render() {
-      return this.render()
+      const { type } = getCurrentInstance()
+      return withScopeId(type.__scopeId)(this.renderFn)()
     }
   }
 </script>

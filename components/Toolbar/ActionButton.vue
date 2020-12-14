@@ -1,6 +1,11 @@
 <script>
+  import GIcon from 'pos-vue-framework/src/components/GIcon/GIcon'
+  import GBtn from 'pos-vue-framework/src/components/GBtn/GBtn'
+  import {getCurrentInstance, withScopeId} from 'vue'
+
   export default {
     name: 'ActionButton',
+    components: {GIcon, GBtn},
     props: {
       actionName: String,
       actionIcon: String,
@@ -29,14 +34,14 @@
         context.emit(props.actionName)
       }
 
-      function render() {
+      function renderFn() {
         return context.slots.default &&
             context.slots.default({[props.actionName]: onAction})
             ||
             (
                 <g-btn outlined={props.outlined} class="mx-1 action-btn" disabled={props.disabled} flat
                        background-color={props.backgroundColor} text-color={props.textColor}
-                       vOn:click={() => context.emit(props.actionName)}>
+                       onClick={() => context.emit(props.actionName)}>
                   <g-icon class="action-btn__icon" color={props.actionIconColor} small>{props.actionIcon}</g-icon>
                   <span style="margin-left: 10px">{capitalize(props.actionText)}</span>
                 </g-btn>
@@ -44,11 +49,12 @@
       }
 
       return {
-        render
+        renderFn
       }
     },
     render() {
-      return this.render()
+      const { type } = getCurrentInstance()
+      return withScopeId(type.__scopeId)(this.renderFn)()
     }
   }
 </script>

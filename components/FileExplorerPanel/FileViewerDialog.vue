@@ -44,6 +44,8 @@
 </template>
 
 <script>
+  import { nextTick } from 'vue';
+
   export default {
     name: "FileViewerDialog",
     props: {
@@ -98,7 +100,7 @@
         }
       },
       addMediaMetadataListeners() {
-        this.$nextTick(() => {
+        nextTick(() => {
           setTimeout(() => {
             const video = document.querySelector('#video')
             const image = document.querySelector('#image')

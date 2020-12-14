@@ -1,5 +1,5 @@
 <script>
-  import {ref} from "@vue/composition-api";
+  import {ref, getCurrentInstance, withScopeId} from "vue";
 
   export default {
     name: 'ViewOption',
@@ -28,14 +28,14 @@
         if (typeof s !== 'string') return ''
         return s.charAt(0).toUpperCase() + s.slice(1)
       }
-      const selectedOptionText = ref((props.options.find(e => e.value === props.selectedOption)))
+      const selectedOptionText = ref((props.options.find(e => e.value === props.selectedOption).text))
       const showMenu = ref(false)
       const onOptionSelected = function (option, optionText) {
         selectedOptionText.value = optionText
         context.emit(`update:${props.optionType}`, option)
       }
 
-      function render() {
+      function renderFn() {
         return context.slots.default &&
             context.slots.default({
               [`on${capitalize(props.optionType)}Selected`]: onOptionSelected,
@@ -44,53 +44,47 @@
             })
             || <g-menu
                 {...{
-                  props: {
-                    value: showMenu.value,
-                    closeOnContentClick: true,
-                    nudgeBottom: 10,
-                    nudgeRight: 25,
-                    contentClass: `file-explorer-view-option`,
+                  modelValue: showMenu.value,
+                  closeOnContentClick: true,
+                  nudgeBottom: 10,
+                  nudgeRight: 25,
+                  contentClass: `file-explorer-view-option`,
+                  'onUpdate:modelValue': e => showMenu.value = e,
+                }} vSlots={{
+                  activator: ({on}) => {
+                    return (
+                        <g-btn class="mx-1 view-option__btn" onClick={on.click} outlined={props.outlined} flat={true}
+                               background-color={props.backgroundColor} text-color={props.textColor}
+                               disabled={props.disabled}>
+                          <g-icon class="file-icon" color="#000000" small>{props.optionIcon}</g-icon>
+                          <span style="margin-left: 10px">{`${props.prependText}${props.selectedOption === null ? capitalize(props.optionType) : selectedOptionText.value}`}</span>
+                        </g-btn>
+                    )
                   },
-                  on: {
-                    input: e => showMenu.value = e,
-                  },
-                  scopedSlots: {
-                    activator: ({on}) => {
-                      return (
-                          <g-btn class="mx-1 view-option__btn" vOn:click={on.click} outlined={props.outlined} flat
-                                 background-color={props.backgroundColor} text-color={props.textColor}
-                                 disabled={props.disabled}>
-                            <g-icon class="file-icon" color="#000000" small>{props.optionIcon}</g-icon>
-                            <span
-                                style="margin-left: 10px">{props.prependText}{props.selectedOption === null ? capitalize(props.optionType) : selectedOptionText.value}</span>
-                          </g-btn>
-                      )
-                    },
-                    default: () => {
-                      return (
-                          <div class="view-option__options">
-                            {props.options.map(({text, value}) => {
-                              return (
-                                  <g-btn class="view-option__option" flat outlined={props.outlined} flat
-                                         background-color={props.backgroundColor} text-color={props.textColor}
-                                         disabled={props.disabled}
-                                         vOn:click={() => onOptionSelected(value, text)}>{text}</g-btn>
-                              )
-                            })}
-                          </div>
-                      )
-                    }
+                  default: () => {
+                    return (
+                        <div class="view-option__options">
+                          {props.options.map(({text, value}) => {
+                            return (
+                                <g-btn class="view-option__option" flat={true} outlined={props.outlined}
+                                       background-color={props.backgroundColor} text-color={props.textColor}
+                                       disabled={props.disabled}
+                                       onClick={() => onOptionSelected(value, text)}>{text}</g-btn>
+                            )
+                          })}
+                        </div>
+                    )
                   }
-                }}>
-            </g-menu>
+                }}/>
       }
 
       return {
-        render
+        renderFn, selectedOptionText
       }
     },
     render() {
-      return this.render()
+      const { type } = getCurrentInstance()
+      return withScopeId(type.__scopeId)(this.renderFn)()
     }
   }
 </script>

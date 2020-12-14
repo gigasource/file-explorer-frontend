@@ -1,6 +1,5 @@
 module.exports = {
   presets: [
-    'vca-jsx',
     ['@vue/app',
       {
         "useBuiltIns": "entry"
@@ -8,7 +7,7 @@ module.exports = {
   ],
   env: {
     test: {
-      plugins: ["require-context-hook"]
+      plugins: ["require-context-hook", "@vue/babel-plugin-jsx"]
     }
   }
 }

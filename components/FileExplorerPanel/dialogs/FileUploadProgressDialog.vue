@@ -1,5 +1,5 @@
 <template>
-  <g-dialog :width="width" :value="value && uploadingItems.length > 0" content-class="file-upload-dialog" hide-overlay persistent>
+  <g-dialog :width="width" v-model="modelValue && uploadingItems.length > 0" content-class="file-upload-dialog" hide-overlay persistent>
     <div class="file-upload-dialog__header">
       <div class="file-upload-dialog__header__title">{{title}}</div>
       <g-icon class="file-upload-dialog__header__close-btn" color="#F5F5F5" @click="close" medium>fas fa-times</g-icon>
@@ -17,7 +17,7 @@
           <g-btn icon v-if="uploadItem.hovered && !uploadItem.success" small @click="cancelUpload(uploadItem)">
             <g-icon color="#757575" medium>fas fa-times-circle</g-icon>
           </g-btn>
-          <g-progress-circular v-else-if="uploadItem.inProgress" class="upload-item__progress--uploading" v-else size="25" color="#536DFE" :value="uploadItem.progress"/>
+          <g-progress-circular v-else-if="uploadItem.inProgress" class="upload-item__progress--uploading" size="25" color="#536DFE" :value="uploadItem.progress"/>
           <div v-else-if="uploadItem.success" class="upload-item__progress--finished">
             <img alt :src="uploadCompleted"/>
           </div>
@@ -47,7 +47,7 @@
     name: "FileUploadProgressDialog",
     components: {ActionConfirmDialog},
     props: {
-      value: Boolean,
+      modelValue: Boolean,
       width: {
         type: Number,
         default: 440,
@@ -95,7 +95,7 @@
       cancelAllUploads() {
         this.uploadingItems.forEach(uploadItem => uploadItem.cancel())
         this.$emit('update:uploadingItems', [])
-        this.$emit('input', false)
+        this.$emit('update:modelValue', false)
       },
       isUploading() {
         return this.uploadingItems.find(item => item.inProgress)
@@ -105,7 +105,7 @@
           this.showConfirmCancelUploadDialog = true
         } else {
           this.$emit('update:uploadingItems', [])
-          this.$emit('input', false)
+          this.$emit('update:modelValue', false)
         }
       }
     }

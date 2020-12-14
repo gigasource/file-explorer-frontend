@@ -1,5 +1,5 @@
 <template>
-  <g-dialog :value="value" persistent width="30%">
+  <g-dialog v-model="modelValue" persistent width="30%">
     <g-card elevation="16">
       <g-card-title class="dialog">
         Rename file {{file && file.fileName}}
@@ -22,7 +22,7 @@
   export default {
     name: "FileRenameDialog.vue",
     props: {
-      value: Boolean,
+      modelValue: Boolean,
       files: Array,
       file: Object,
     },
@@ -40,7 +40,7 @@
         this.close()
       },
       close() {
-        this.$emit('input', false)
+        this.$emit('update:modelValue', false)
       },
     },
     watch: {

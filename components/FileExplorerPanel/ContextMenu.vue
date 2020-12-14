@@ -1,6 +1,6 @@
 <script>
   import {Fragment} from 'vue-fragment'
-  import {computed} from '@vue/composition-api'
+  import {computed, getCurrentInstance, withScopeId} from 'vue'
 
   export default {
     name: 'ContextMenu',
@@ -16,6 +16,7 @@
     data() {
       return {}
     },
+    emits: ['open', 'newFile', 'newFolder', 'cut', 'copy', 'paste', 'delete', 'rename'],
     setup(props, context) {
       const contextOptionClasses = {
         option: 'context-menu-option',
@@ -27,6 +28,20 @@
       });
 
       function renderBaseContextOptions() {
+
+      }
+
+      function renderExtraContextOptions() {
+        if (!Array.isArray(props.appendContextOptions) || props.appendContextOptions.length === 0) return null
+
+        return props.appendContextOptions.map(({text, handler}) => (
+                  <div class='context-menu-option' onClick={() => handler(props.file)}>{text}</div>
+        ))
+      }
+
+      function renderFn() {
+        if (context.slots.default) return context.slots.default({file: props.file})
+
         function createOptionData(action, classes, disabled) {
           if (!classes) classes = {}
 
@@ -36,16 +51,14 @@
               'context-menu-option__disabled': disabled,
               ...classes,
             },
-            on: {
-              click: () => {
-                if (!disabled) context.emit(action, props.file)
-              }
+            onClick: () => {
+              if (!disabled) context.emit(action, props.file)
             }
           }
         }
 
         return (
-            <fragment>
+            <div class="context-menu">
               <div {...createOptionData('open', {'border': true}, !props.file)}>Open</div>
               <div {...createOptionData('newFile', null)}>Upload file</div>
               <div {...createOptionData('newFolder', {'border': true})}>New folder</div>
@@ -54,39 +67,18 @@
               <div {...createOptionData('paste', null, !props.fileInClipboard || disablePaste.value)}>Paste</div>
               <div {...createOptionData('delete', null, !props.file)}>Delete</div>
               <div {...createOptionData('rename', null, !props.file)}>Rename</div>
-            </fragment>
-        )
-      }
-
-      function renderExtraContextOptions() {
-        if (!Array.isArray(props.appendContextOptions) || props.appendContextOptions.length === 0) return null
-
-        return (
-            <fragment>
-              {props.appendContextOptions.map(({text, handler}) => (
-                  <div class='context-menu-option' vOn:click={() => handler(props.file)}>{text}</div>
-              ))}
-            </fragment>
-        )
-      }
-
-      function render() {
-        if (context.slots.default) return context.slots.default({file: props.file})
-
-        return (
-            <div class="context-menu">
-              {renderBaseContextOptions()}
               {renderExtraContextOptions()}
             </div>
         )
       }
 
       return {
-        render
+        renderFn
       };
     },
     render() {
-      return this.render();
+      const { type } = getCurrentInstance()
+      return withScopeId(type.__scopeId)(this.renderFn)();
     }
   }
 </script>

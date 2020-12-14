@@ -1,9 +1,9 @@
 <template>
-  <g-row v-show="value" v-droppable.file @drag-leave="hideOverlay" @drag-drop="dropFiles"
+  <g-row v-show="modelValue" v-droppable.file @drag-leave="hideOverlay" @drag-drop="dropFiles"
          class="drop-zone-overlay" justify-content="center"
          align-items="center">
     <div class="ta-center">
-      <g-icon class="upload-icon animated infinite bounce" xLarge color="#536DFE" xLarge>fas fa-cloud-upload-alt
+      <g-icon class="upload-icon animated infinite bounce" xLarge color="#536DFE">fas fa-cloud-upload-alt
       </g-icon>
       <div class="mt-3 upload-msg">Drop files/folders here to upload</div>
     </div>
@@ -19,11 +19,11 @@
       Droppable
     },
     props: {
-      value: Boolean,
+      modelValue: Boolean,
     },
     methods: {
       hideOverlay() {
-        this.$emit('input', false)
+        this.$emit('update:modelValue', false)
       },
       dropFiles(fileDataList) {
         const fileList = fileDataList.filter(data => data.file).map(data => data.file)

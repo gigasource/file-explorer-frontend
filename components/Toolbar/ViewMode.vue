@@ -1,4 +1,9 @@
 <script>
+  import GItemGroup from 'pos-vue-framework/src/components/GItemGroup/GItemGroup'
+  import GIcon from 'pos-vue-framework/src/components/GIcon/GIcon'
+  import GBtn from 'pos-vue-framework/src/components/GBtn/GBtn'
+  import {getCurrentInstance, withScopeId} from 'vue';
+
   export default {
     name: 'ViewMode',
     props: {
@@ -21,7 +26,7 @@
         context.emit('update:viewMode', viewMode)
       }
 
-      function render() {
+      function renderFn() {
         return context.slots.default &&
             context.slots.default({onViewModeUpdated, selectedViewMode: props.selectedViewMode})
             || <g-item-group class="view-mode mx-1">
@@ -33,17 +38,11 @@
                         [`view-mode--${mode}`]: true,
                         'view-mode--selected': props.selectedViewMode === mode,
                       },
-                      props: {
-                        flat: true,
-                        backgroundColor: props.backgroundColor,
-                        textColor: props.textColor,
-                        disabled: props.disabled,
-                      },
-                      on: {
-                        click() {
-                          onViewModeUpdated(mode)
-                        }
-                      }
+                      flat: true,
+                      backgroundColor: props.backgroundColor,
+                      textColor: props.textColor,
+                      disabled: props.disabled,
+                      onClick: () => onViewModeUpdated(mode)
                     }}>
                       <g-icon class="file-icon"
                               color={props.selectedViewMode === mode ? 'white' : 'black'}
@@ -55,11 +54,12 @@
       }
 
       return {
-        render
+        renderFn
       }
     },
     render() {
-      return this.render()
+      const { type } = getCurrentInstance()
+      return withScopeId(type.__scopeId)(this.renderFn)()
     }
   }
 </script>

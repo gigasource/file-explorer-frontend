@@ -3,6 +3,7 @@
   import {Draggable} from "pos-vue-framework"
   import videoThumbGridItem from '../../assets/images/video-thumb-grid-item.svg'
   import folderImage from '../../assets/images/folder-image.svg'
+  import {getCurrentInstance, withScopeId} from 'vue'
 
   export default {
     name: 'File',
@@ -18,6 +19,7 @@
       draggable: Boolean,
       fileNameDisplayMaxLength: Number,
     },
+    emits: ['click', 'dblclick', 'contextmenu', 'updateFileName'],
     setup(props, context) {
       function renderFileIcon() {
         const fileIconSrc = props.file.thumbnailUrl || props.file.viewUrl
@@ -64,17 +66,15 @@
             'file--list': props.viewMode === 'list',
             'file--selected': props.selected,
           },
-          on: {
-            click() {
+          onClick() {
               context.emit('click', props.file);
-            },
-            dblclick() {
+          },
+          onDblclick() {
               context.emit('dblclick', props.file);
-            },
-            contextmenu(e) {
+          },
+          onContextmenu(e) {
               e.preventDefault()
               context.emit('contextmenu', e, props.file);
-            },
           },
         }
 
@@ -108,7 +108,8 @@
       }
     },
     render() {
-      return this.renderFile()
+      const { type } = getCurrentInstance()
+      return withScopeId(type.__scopeId)(this.renderFile)()
     }
   }
 </script>

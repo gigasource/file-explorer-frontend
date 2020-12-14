@@ -1,5 +1,5 @@
 <script>
-  import {computed} from '@vue/composition-api'
+  import {computed, getCurrentInstance, withScopeId} from 'vue'
   import {folderArrayToFolderParth, folderPathToFolderArray} from '../../utils/file-path'
 
   export default {
@@ -65,19 +65,15 @@
         else return node.folderName
       }
 
-      function render() {
+      function renderFn() {
         const elementData = {
-          props: {
             data: treeData.value,
             itemText,
             itemChildren: 'folders',
             itemIcon: nodeIcon,
             expandLevel: 2,
             value: selectedPath.value,
-          },
-          on: {
-            'node-selected': onFolderSelected
-          },
+            'onNode-selected': onFolderSelected
         }
 
         if (props.folderTree) {
@@ -91,10 +87,11 @@
         }
       }
 
-      return {render, selectedPath}
+      return {renderFn, selectedPath}
     },
     render() {
-      return this.render();
+      const { type } = getCurrentInstance()
+      return withScopeId(type.__scopeId)(this.renderFn)();
     }
   }
 </script>
