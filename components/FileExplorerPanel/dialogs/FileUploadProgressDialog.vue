@@ -17,7 +17,7 @@
           <g-btn icon v-if="uploadItem.hovered && !uploadItem.success" small @click="cancelUpload(uploadItem)">
             <g-icon color="#757575" medium>fas fa-times-circle</g-icon>
           </g-btn>
-          <g-progress-circular v-else-if="uploadItem.inProgress" class="upload-item__progress--uploading" v-else size="25" color="#536DFE" :value="uploadItem.progress"/>
+          <g-progress-circular v-else-if="uploadItem.inProgress" class="upload-item__progress--uploading" size="25" color="#536DFE" :value="uploadItem.progress"/>
           <div v-else-if="uploadItem.success" class="upload-item__progress--finished">
             <img alt :src="uploadCompleted"/>
           </div>
