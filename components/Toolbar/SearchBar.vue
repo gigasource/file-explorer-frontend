@@ -1,6 +1,6 @@
 <script>
   import _ from 'lodash';
-  import {getCurrentInstance, withScopeId} from 'vue'
+  import { getScopeIdRender } from "../../utils/get-scope-id-render";
 
   export default {
     name: "Search",
@@ -14,15 +14,15 @@
       const renderSearchField = function () {
         const fallbackContent = (
             <g-text-field class="mx-1 search row-flex align-items-center br-2 pa-1"
-                {...{
-                  type: "text",
-                  prependInnerIcon: "search",
-                  solo: true,
-                  flat: true,
-                  modelValue: props.searchText,
-                  'onUpdate:modelValue':onSearchInput,
-                  placeholder: props.placeholder
-                }}/>
+                          {...{
+                            type: "text",
+                            prependInnerIcon: "search",
+                            solo: true,
+                            flat: true,
+                            modelValue: props.searchText,
+                            'onUpdate:modelValue': onSearchInput,
+                            placeholder: props.placeholder
+                          }}/>
         );
 
         return (context.slots.default && context.slots.default({
@@ -38,8 +38,8 @@
       }
     },
     render() {
-      const { type } = getCurrentInstance()
-      return withScopeId(type.__scopeId)(this.renderSearchField)();
+      const renderWithScopeId = getScopeIdRender();
+      return renderWithScopeId(this.renderSearchField)();
     }
   }
 </script>

@@ -2,6 +2,7 @@
   import { computed } from 'vue'
   import fileExplorerPathFolder from '../../assets/images/file-explorer-path-folder.svg'
   import fileExplorerPathSeparator from '../../assets/images/file-explorer-path-separator.svg';
+  import { getScopeIdRender } from '../../utils/get-scope-id-render.js';
 
   export default {
     name: 'AddressBar',
@@ -38,7 +39,7 @@
         const updatePath = absolutePath => context.emit('update:path', absolutePath)
 
         if (context.slots.default) {
-          return context.slots.default({breadcrumbs: breadcrumbs.value, updatePath})
+          return context.slots.default({ breadcrumbs: breadcrumbs.value, updatePath })
         }
 
         const elementData = {
@@ -90,7 +91,8 @@
       }
     },
     render() {
-      return this.renderFn()
+      const renderWithScopeId = getScopeIdRender();
+      return renderWithScopeId(this.renderFn)();
     }
   }
 </script>

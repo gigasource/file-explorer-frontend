@@ -1,17 +1,18 @@
 <script>
   import _ from 'lodash'
-  import {ref, watch, computed, getCurrentInstance, withScopeId} from 'vue'
+  import { ref, watch, computed } from 'vue'
   import Toolbar from './Toolbar/Toolbar'
   import AddressBar from './AddressBar/AddressBar'
   import FileExplorerPanel from './FileExplorerPanel/FileExplorerPanel'
-  import {Fragment} from 'vue-fragment'
   import FolderTree from './FolderTree/FolderTree'
-  import {folderArrayToFolderParth, folderPathToFolderArray} from '../utils/file-path'
+  import { folderArrayToFolderParth, folderPathToFolderArray } from '../utils/file-path'
   import _openUploadFileDialog from '../api-handlers/openUploadFileDialog';
+  import { getScopeIdRender } from '../utils/get-scope-id-render.js';
 
   export default {
     name: 'FileExplorer',
-    components: {FolderTree, FileExplorerPanel, AddressBar, Toolbar, Fragment},
+    components: { FolderTree, FileExplorerPanel, AddressBar, Toolbar },
+    emits: ['open'],
     props: {
       apiHandler: Object,
 
@@ -81,7 +82,7 @@
         folderTree.value = await props.apiHandler.getFolderTree(path.value)
       }
 
-      watch(() => [path.value], refresh)
+      watch(() => [path.value], refresh, {immediate: true})
 
       const activeFiles = computed(() => getFilteredFiles(files.value, path.value, fileSort.value, searchText.value))
 
@@ -96,14 +97,23 @@
       }
 
       function uploadFiles(files) {
-        const uploads = props.apiHandler.uploadFiles(files, path.value, refresh, true)
+        const uploads = props.apiHandler.uploadFiles(files, path.value, {
+          uploadCompletedCallback(...args) {
+            uploadingItems.value = [...uploadingItems.value];
+            refresh(...args);
+          },
+          ignoreDuplicate: true,
+          uploadProgressCallback() {
+            uploadingItems.value = [...uploadingItems.value];
+          },
+        });
 
         showFileUploadProgressDialog.value = true
         uploadingItems.value = uploadingItems.value.concat(uploads)
       }
 
       function openUploadFileDialog() {
-        _openUploadFileDialog({mimeType: "*", multiple: true}, uploadFiles)
+        _openUploadFileDialog({ mimeType: "*", multiple: true }, uploadFiles)
       }
 
       async function onNewFolder() {
@@ -123,7 +133,7 @@
       }
 
       function sortFiles(sort, files) {
-        const collator = new Intl.Collator(undefined, {numeric: true});
+        const collator = new Intl.Collator(undefined, { numeric: true });
 
         switch (sort) {
           case 'az':
@@ -148,27 +158,27 @@
         return (
             <toolbar {...{
               //props
-                selectedViewMode: viewMode.value,
-                selectedSort: fileSort.value,
-                viewMode: viewMode.value,
-                path: path.value,
+              selectedViewMode: viewMode.value,
+              selectedSort: fileSort.value,
+              viewMode: viewMode.value,
+              path: path.value,
 
-                searchText: searchText.value,
-                slotNames: {...toolbarSlots, ...addressBarSlots},
-                addressBarDivider: props.addressBarDivider,
-                hideComponents: props.hideComponents,
-                addressBarVNode,
+              searchText: searchText.value,
+              slotNames: { ...toolbarSlots, ...addressBarSlots },
+              addressBarDivider: props.addressBarDivider,
+              hideComponents: props.hideComponents,
+              addressBarVNode,
               //events
-                'onUpdate:viewMode': mode => {
-                  viewMode.value = mode
-                  context.emit('update:viewMode', mode)
-                },
-                'onUpdate:sort': sort => fileSort.value = sort,
-                'onUpdate:searchText': e => searchText.value = e,
-                'onUpdate:path': p => path.value = p,
-                onNewFile: openUploadFileDialog,
-                onNewFolder,
-                onUp,
+              'onUpdate:viewMode': mode => {
+                viewMode.value = mode
+                context.emit('update:viewMode', mode)
+              },
+              'onUpdate:sort': sort => fileSort.value = sort,
+              'onUpdate:searchText': e => searchText.value = e,
+              'onUpdate:path': p => path.value = p,
+              onNewFile: openUploadFileDialog,
+              onNewFolder,
+              onUp,
             }} vSlots={context.slots}/>
         )
       }
@@ -185,7 +195,7 @@
           'onUpdate:path': p => path.value = p,
         }
 
-        if(context.slots[addressBarSlots.addressBar])
+        if (context.slots[addressBarSlots.addressBar])
           return <address-bar {...elementData}>{context.slots[addressBarSlots.addressBar]()}</address-bar>
         return <address-bar {...elementData}/>
       }
@@ -290,7 +300,7 @@
         const folderTreeVNode = renderFolderTree()
 
         return (context.slots.components &&
-                  context.slots.components({addressBarVNode, toolbarVNode, fileExplorerVNode, folderTreeVNode})
+                context.slots.components({ addressBarVNode, toolbarVNode, fileExplorerVNode, folderTreeVNode })
             )
             //fallback content
             || (
@@ -306,8 +316,8 @@
       }
     },
     render() {
-      const { type } = getCurrentInstance()
-      return withScopeId(type.__scopeId)(this.renderFn)()
+      const renderWithScopeId = getScopeIdRender();
+      return renderWithScopeId(this.renderFn)();
     }
   }
 </script>

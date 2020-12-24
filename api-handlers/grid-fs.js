@@ -2,19 +2,20 @@ import createCommonApiHandlers from './common'
 import forEach from 'lodash/forEach'
 import ax from 'axios'
 
-const CancelToken = axios.CancelToken
+const CancelToken = ax.CancelToken;
 
 function createGridFsHandlers(options) {
-  const {apiBaseUrl, namespace, imageThumbnailSize = {}} = options;
+  const { apiBaseUrl, namespace, imageThumbnailSize = {} } = options;
 
-  const axios = ax.create()
+  const axios = ax.create();
+
   if (namespace) axios.defaults.headers.common[namespace.key] = namespace.value;
 
   if (!apiBaseUrl) throw new Error('Missing apiBaseUrl in parameter object')
 
   const commonHandlers = createCommonApiHandlers(options)
 
-  function uploadFiles(files, folderPath, uploadCompletedCallback, ignoreDuplicate, overwrite) {
+  function uploadFiles(files, folderPath, ...args) {
     if (!files || files.length === 0) return
     const uploads = []
 
@@ -22,10 +23,29 @@ function createGridFsHandlers(options) {
       uploads.push(file)
     })
 
-    return uploads.map(f => uploadFile(f, folderPath, uploadCompletedCallback, ignoreDuplicate, overwrite))
+    return uploads.map(f => uploadFile(f, folderPath, ...args))
   }
 
-  function uploadFile(file, folderPath, uploadCompletedCallback, ignoreDuplicate, overwrite) {
+  function uploadFile(file, folderPath, ...args) {
+    let uploadCompletedCallback;
+    let ignoreDuplicate;
+    let overwrite;
+    let uploadProgressCallback;
+
+    if (typeof args[0] === 'function') {
+      // backward compatibility
+      uploadCompletedCallback = args[0];
+      ignoreDuplicate = args[1];
+      overwrite = args[2];
+    } else {
+      const options = args[0];
+
+      uploadCompletedCallback = options.uploadCompletedCallback;
+      ignoreDuplicate = options.ignoreDuplicate;
+      overwrite = options.overwrite;
+      uploadProgressCallback = options.uploadProgressCallback;
+    }
+
     let apiUrl = `${apiBaseUrl}/files?folderPath=${folderPath}`
     if (ignoreDuplicate) apiUrl += '&ignoreDuplicate=true'
     if (overwrite) apiUrl += '&overwrite=true'
@@ -45,10 +65,11 @@ function createGridFsHandlers(options) {
 
     function onUploadProgress(progress) {
       upload.progress = Math.round(progress.loaded * 100 / progress.total)
+      uploadProgressCallback(upload);
     }
 
     let responseData
-    axios.post(apiUrl, formData, {cancelToken: source.token, onUploadProgress})
+    axios.post(apiUrl, formData, { cancelToken: source.token, onUploadProgress })
         .then(async (response) => {
           upload.progress = 100
           upload.success = true
@@ -93,7 +114,7 @@ function createGridFsHandlers(options) {
     }))
   }
 
-  const {getFilesInPath: getFiles, ...commonFunctions} = commonHandlers
+  const { getFilesInPath: getFiles, ...commonFunctions } = commonHandlers
 
   async function getFilesInPath(folderPath) {
     let filesInFolder = await getFiles(folderPath)

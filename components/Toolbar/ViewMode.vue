@@ -1,8 +1,5 @@
 <script>
-  import GItemGroup from 'pos-vue-framework/src/components/GItemGroup/GItemGroup'
-  import GIcon from 'pos-vue-framework/src/components/GIcon/GIcon'
-  import GBtn from 'pos-vue-framework/src/components/GBtn/GBtn'
-  import {getCurrentInstance, withScopeId} from 'vue';
+  import { getScopeIdRender } from "../../utils/get-scope-id-render";
 
   export default {
     name: 'ViewMode',
@@ -22,13 +19,13 @@
     setup(props, context) {
       const viewModes = ['grid', 'list']
 
-      const onViewModeUpdated = function(viewMode) {
+      const onViewModeUpdated = function (viewMode) {
         context.emit('update:viewMode', viewMode)
       }
 
       function renderFn() {
         return context.slots.default &&
-            context.slots.default({onViewModeUpdated, selectedViewMode: props.selectedViewMode})
+            context.slots.default({ onViewModeUpdated, selectedViewMode: props.selectedViewMode })
             || <g-item-group class="view-mode mx-1">
               {viewModes.map(mode => {
                 return (
@@ -58,8 +55,8 @@
       }
     },
     render() {
-      const { type } = getCurrentInstance()
-      return withScopeId(type.__scopeId)(this.renderFn)()
+      const renderWithScopeId = getScopeIdRender();
+      return renderWithScopeId(this.renderFn)();
     }
   }
 </script>
@@ -71,7 +68,7 @@
     cursor: pointer;
     align-items: center;
 
-    &--selection {
+    :deep(.view-mode--selection) {
       height: 100% !important;
       background-color: #fff;
       display: flex;
@@ -79,8 +76,8 @@
       justify-content: center;
     }
 
-    &--selected {
-      background-color: #616161 !important;
+    :deep(.view-mode--selected) {
+      background-color: #536dfe !important;
     }
   }
 </style>

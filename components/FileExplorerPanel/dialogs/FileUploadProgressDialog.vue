@@ -1,23 +1,30 @@
 <template>
-  <g-dialog :width="width" v-model="modelValue && uploadingItems.length > 0" content-class="file-upload-dialog" hide-overlay persistent>
+  <g-dialog :width="width" v-model="showDialog" content-class="file-upload-dialog" hide-overlay persistent>
     <div class="file-upload-dialog__header">
-      <div class="file-upload-dialog__header__title">{{title}}</div>
+      <div class="file-upload-dialog__header__title">{{ title }}</div>
       <g-icon class="file-upload-dialog__header__close-btn" color="#F5F5F5" @click="close" medium>fas fa-times</g-icon>
     </div>
     <div class="file-upload-dialog__items">
       <div v-for="(uploadItem, i) in uploadingItems"
            :class="['upload-item', uploadItem.progress < 100 && 'upload-item--uploading']"
            :key="i">
-        <g-icon v-if="getFileType(uploadItem) === 'image'" class="upload-item__thumbnail" color="#536DFE" medium>fas fa-file-image</g-icon>
-        <g-icon v-else-if="getFileType(uploadItem) === 'video'" class="upload-item__thumbnail" color="#536DFE" medium>fas fa-file-video</g-icon>
+        <g-icon v-if="getFileType(uploadItem) === 'image'" class="upload-item__thumbnail" color="#536DFE" medium>
+          fas fa-file-image
+        </g-icon>
+        <g-icon v-else-if="getFileType(uploadItem) === 'video'" class="upload-item__thumbnail" color="#536DFE" medium>
+          fas fa-file-video
+        </g-icon>
         <g-icon v-else class="upload-item__thumbnail" color="#536DFE" medium>fas fa-file</g-icon>
         <div class="upload-item__title">{{ uploadItem.fileName }}</div>
         <g-spacer/>
-        <div class="upload-item__progress" @mouseenter="mouseEnterUploadProgress(uploadItem)" @mouseleave="mouseLeaveUploadProgress(uploadItem)">
+        <div class="upload-item__progress"
+             @mouseenter="mouseEnterUploadProgress(uploadItem)"
+             @mouseleave="mouseLeaveUploadProgress(uploadItem)">
           <g-btn icon v-if="uploadItem.hovered && !uploadItem.success" small @click="cancelUpload(uploadItem)">
             <g-icon color="#757575" medium>fas fa-times-circle</g-icon>
           </g-btn>
-          <g-progress-circular v-else-if="uploadItem.inProgress" class="upload-item__progress--uploading" size="25" color="#536DFE" :value="uploadItem.progress"/>
+          <g-progress-circular v-else-if="uploadItem.inProgress" class="upload-item__progress--uploading" size="25"
+                               color="#536DFE" :value="uploadItem.progress"/>
           <div v-else-if="uploadItem.success" class="upload-item__progress--finished">
             <img alt :src="uploadCompleted"/>
           </div>
@@ -45,7 +52,7 @@
 
   export default {
     name: "FileUploadProgressDialog",
-    components: {ActionConfirmDialog},
+    components: { ActionConfirmDialog },
     props: {
       modelValue: Boolean,
       width: {
@@ -70,7 +77,10 @@
         } else {
           return `Upload ${this.uploadingItems.length} ${this.uploadingItems.length === 1 ? 'file' : 'files'} complete`
         }
-      }
+      },
+      showDialog() {
+        return this.modelValue && this.uploadingItems.length > 0;
+      },
     },
     methods: {
       getFileType(file) {
@@ -79,10 +89,10 @@
         else return 'other'
       },
       mouseEnterUploadProgress(file) {
-        this.$set(file, 'hovered', true)
+        file.hovered = true;
       },
       mouseLeaveUploadProgress(file) {
-        this.$set(file, 'hovered', false)
+        file.hovered = false;
       },
       cancelUpload(uploadItem) {
         const itemIndex = this.uploadingItems.indexOf(uploadItem)
@@ -107,8 +117,8 @@
           this.$emit('update:uploadingItems', [])
           this.$emit('update:modelValue', false)
         }
-      }
-    }
+      },
+    },
   }
 </script>
 

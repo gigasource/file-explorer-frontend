@@ -1,21 +1,23 @@
 <script>
-  import {ref, getCurrentInstance, withScopeId} from 'vue'
+  import { ref, watch } from 'vue'
   import File from './File'
   import ContextMenu from "./ContextMenu"
   import FileViewerDialog from "./dialogs/FileViewerDialog"
   import FileRenameDialog from './dialogs/FileRenameDialog'
   import ActionConfirmDialog from "./dialogs/ActionConfirmDialog"
   import FileUploadProgressDialog from "./dialogs/FileUploadProgressDialog";
-  import {Droppable} from "pos-vue-framework";
+  import { Droppable } from "pos-vue-framework";
   import DropZoneOverlay from "./DropZoneOverlay";
   import _ from 'lodash'
   import emptyFolder from '../../assets/images/empty_folder.svg'
+  import { getScopeIdRender } from "../../utils/get-scope-id-render";
 
   export default {
     name: 'FileExplorerPanel',
     directives: {
       Droppable
     },
+    emits: ['open'],
     components: {
       DropZoneOverlay,
       FileUploadProgressDialog,
@@ -60,7 +62,7 @@
         }
 
         const menuSlots = {
-          activator: ({toggleContent: toggleContextMenu}) => {
+          activator: ({ toggleContent: toggleContextMenu }) => {
             const containerData = {
               class: {
                 'file-container': true,
@@ -147,7 +149,7 @@
           }
         }
 
-        if(context.slots[props.slotNames.file])
+        if (context.slots[props.slotNames.file])
           return <File {...fileElData}>{context.slots[props.slotNames.file]()}</File>
 
         return <File {...fileElData}/>
@@ -185,7 +187,7 @@
           onNewFolder: () => context.emit('newFolder'),
         }
 
-        if(context.slots[props.slotNames.contextMenu])
+        if (context.slots[props.slotNames.contextMenu])
           return <context-menu {...elementData}>
             {context.slots[props.slotNames.contextMenu]()}
           </context-menu>
@@ -246,8 +248,8 @@
 
         const overlayData = {
           modelValue: showDropZoneOverlay.value,
-          'onUpdate:modelValue':  val => showDropZoneOverlay.value = val,
-          onDropFiles:  fileList => context.emit('uploadFiles', fileList),
+          'onUpdate:modelValue': val => showDropZoneOverlay.value = val,
+          onDropFiles: fileList => context.emit('uploadFiles', fileList),
         }
 
         return <drop-zone-overlay {...overlayData}/>
@@ -267,7 +269,7 @@
               {
                 name: 'droppable',
                 value: true,
-                modifiers: {file: true}
+                modifiers: { file: true }
               }
             ],
             'onDrag-over': _.debounce(
@@ -296,8 +298,8 @@
       }
     },
     render() {
-      const { type } = getCurrentInstance()
-      return withScopeId(type.__scopeId)(this.renderFn)()
+      const renderWithScopeId = getScopeIdRender();
+      return renderWithScopeId(this.renderFn)();
     }
   }
 </script>

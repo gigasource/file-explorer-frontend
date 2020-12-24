@@ -1,14 +1,14 @@
 <script>
   import ContextMenu from "./ContextMenu"
-  import {Draggable} from "pos-vue-framework"
+  import { Draggable } from "pos-vue-framework"
   import videoThumbGridItem from '../../assets/images/video-thumb-grid-item.svg'
   import folderImage from '../../assets/images/folder-image.svg'
-  import {getCurrentInstance, withScopeId} from 'vue'
+  import { getScopeIdRender } from "../../utils/get-scope-id-render";
 
   export default {
     name: 'File',
-    directives: {Draggable},
-    components: {ContextMenu},
+    directives: { Draggable },
+    components: { ContextMenu },
     props: {
       file: Object,
       selected: {
@@ -67,14 +67,14 @@
             'file--selected': props.selected,
           },
           onClick() {
-              context.emit('click', props.file);
+            context.emit('click', props.file);
           },
           onDblclick() {
-              context.emit('dblclick', props.file);
+            context.emit('dblclick', props.file);
           },
           onContextmenu(e) {
-              e.preventDefault()
-              context.emit('contextmenu', e, props.file);
+            e.preventDefault()
+            context.emit('contextmenu', e, props.file);
           },
         }
 
@@ -84,7 +84,7 @@
               {
                 name: 'draggable',
                 value: props.file,
-                modifiers: {move: true}
+                modifiers: { move: true }
               }
             ]
           })
@@ -108,8 +108,8 @@
       }
     },
     render() {
-      const { type } = getCurrentInstance()
-      return withScopeId(type.__scopeId)(this.renderFile)()
+      const renderWithScopeId = getScopeIdRender();
+      return renderWithScopeId(this.renderFile)();
     }
   }
 </script>

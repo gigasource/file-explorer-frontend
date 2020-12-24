@@ -1,11 +1,11 @@
 <script>
-  import {computed, getCurrentInstance, withScopeId} from 'vue'
-  import {folderArrayToFolderParth, folderPathToFolderArray} from '../../utils/file-path'
+  import { computed } from 'vue'
+  import { folderArrayToFolderParth, folderPathToFolderArray } from '../../utils/file-path'
+  import { getScopeIdRender } from "../../utils/get-scope-id-render";
 
   export default {
     name: "FolderTree",
     props: {
-      value: String,
       folders: Array,
       folderTree: Array,
       path: String,
@@ -31,6 +31,7 @@
       }
 
       const selectedPath = computed(() => {
+        console.log(folderPathToTreePath(props.path));
         return folderPathToTreePath(props.path)
       })
 
@@ -67,13 +68,13 @@
 
       function renderFn() {
         const elementData = {
-            data: treeData.value,
-            itemText,
-            itemChildren: 'folders',
-            itemIcon: nodeIcon,
-            expandLevel: 2,
-            value: selectedPath.value,
-            'onNode-selected': onFolderSelected
+          data: treeData.value,
+          itemText,
+          itemChildren: 'folders',
+          itemIcon: nodeIcon,
+          expandLevel: 2,
+          modelValue: selectedPath.value,
+          onNodeSelected: onFolderSelected
         }
 
         if (props.folderTree) {
@@ -87,11 +88,11 @@
         }
       }
 
-      return {renderFn, selectedPath}
+      return { renderFn, selectedPath }
     },
     render() {
-      const { type } = getCurrentInstance()
-      return withScopeId(type.__scopeId)(this.renderFn)();
+      const renderWithScopeId = getScopeIdRender();
+      return renderWithScopeId(this.renderFn)();
     }
   }
 </script>

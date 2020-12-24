@@ -2,13 +2,12 @@
   import SearchBar from "./SearchBar"
   import ViewMode from './ViewMode'
   import ViewOption from "./ViewOption";
-  import {Fragment} from 'vue-fragment';
   import ActionButton from "./ActionButton";
   import AddressBar from "../AddressBar/AddressBar";
-  import {getCurrentInstance, withScopeId} from 'vue';
+  import { getScopeIdRender } from "../../utils/get-scope-id-render";
 
   export default {
-    components: {AddressBar, ActionButton, ViewOption, ViewMode, SearchBar, Fragment},
+    components: { AddressBar, ActionButton, ViewOption, ViewMode, SearchBar },
     props: {
       selectedViewMode: String,
       selectedFilter: String,
@@ -32,20 +31,20 @@
       const renderUpButton = () => {
         if (isHidden(props.slotNames.btnBack)) return ''
 
-        if(context.slots[props.slotNames.btnBack])
+        if (context.slots[props.slotNames.btnBack])
           return <action-button {...{
-              actionText: 'Up',
-              actionIcon: 'fas fa-arrow-up',
-              actionName: 'up',
-              disabled: props.path === '/',
-            onUp: () => context.emit('up'),
-          }}>{context.slots[props.slotNames.btnBack]()}</action-button>
-
-        return <action-button {...{
             actionText: 'Up',
             actionIcon: 'fas fa-arrow-up',
             actionName: 'up',
             disabled: props.path === '/',
+            onUp: () => context.emit('up'),
+          }}>{context.slots[props.slotNames.btnBack]()}</action-button>
+
+        return <action-button {...{
+          actionText: 'Up',
+          actionIcon: 'fas fa-arrow-up',
+          actionName: 'up',
+          disabled: props.path === '/',
           onUp: () => context.emit('up'),
         }}/>
       }
@@ -53,7 +52,7 @@
       const renderViewMode = () => {
         if (isHidden(props.slotNames.viewModeSelection)) return ''
 
-        if(context.slots[props.slotNames.viewModeSelection])
+        if (context.slots[props.slotNames.viewModeSelection])
           return <view-mode {...{
             selectedViewMode: props.selectedViewMode,
             'onUpdate:viewMode': viewMode => context.emit('update:viewMode', viewMode),
@@ -68,15 +67,15 @@
       const renderFileSort = () => {
         if (isHidden(props.slotNames.fileSort)) return ''
 
-        if(context.slots[props.slotNames.fileSort])
+        if (context.slots[props.slotNames.fileSort])
           return <view-option {...{
             prependText: 'Sort: ',
             selectedOption: props.selectedSort,
             options: [
-              {text: 'A-Z', value: 'az'},
-              {text: 'Z-A', value: 'za'},
-              {text: 'Newer', value: 'new'},
-              {text: 'Older', value: 'old'},
+              { text: 'A-Z', value: 'az' },
+              { text: 'Z-A', value: 'za' },
+              { text: 'Newer', value: 'new' },
+              { text: 'Older', value: 'old' },
             ],
             optionIcon: 'fas fa-sort',
             optionType: 'sort',
@@ -84,17 +83,17 @@
           }}>{context.slots[props.slotNames.fileSort]()}</view-option>
 
         return <view-option {...{
-            prependText: 'Sort: ',
-            selectedOption: props.selectedSort,
-            options: [
-              {text: 'A-Z', value: 'az'},
-              {text: 'Z-A', value: 'za'},
-              {text: 'Newer', value: 'new'},
-              {text: 'Older', value: 'old'},
-            ],
-            optionIcon: 'fas fa-sort',
-            optionType: 'sort',
-            'onUpdate:sort': sort => context.emit('update:sort', sort)
+          prependText: 'Sort: ',
+          selectedOption: props.selectedSort,
+          options: [
+            { text: 'A-Z', value: 'az' },
+            { text: 'Z-A', value: 'za' },
+            { text: 'Newer', value: 'new' },
+            { text: 'Older', value: 'old' },
+          ],
+          optionIcon: 'fas fa-sort',
+          optionType: 'sort',
+          'onUpdate:sort': sort => context.emit('update:sort', sort)
         }}/>
       }
 
@@ -128,7 +127,7 @@
           context.emit('update:searchText', searchText)
         }
 
-        if(context.slots[props.slotNames.searchBar])
+        if (context.slots[props.slotNames.searchBar])
           return <search-bar {...{
             modelValue: props.searchText,
             placeholder: 'Search',
@@ -136,16 +135,16 @@
           }}>{context.slots[props.slotNames.searchBar]()}</search-bar>
 
         return <search-bar {...{
-            modelValue: props.searchText,
-            placeholder: 'Search',
-            'onUpdate:modelValue': onInput
+          modelValue: props.searchText,
+          placeholder: 'Search',
+          'onUpdate:modelValue': onInput
         }}/>
       }
 
       const renderNewFileButton = () => {
         if (isHidden(props.slotNames.btnNewFile)) return ''
 
-        if(context.slots[props.slotNames.btnNewFile])
+        if (context.slots[props.slotNames.btnNewFile])
           return <action-button {...{
             actionText: 'Upload',
             actionIcon: 'fas fa-cloud-upload-alt',
@@ -157,20 +156,20 @@
           }}>{context.slots[props.slotNames.btnNewFile]()}</action-button>
 
         return <action-button {...{
-            actionText: 'Upload',
-            actionIcon: 'fas fa-cloud-upload-alt',
-            actionName: 'newFile',
-            actionIconColor: 'white',
-            backgroundColor: '#536DFE',
-            textColor: 'white',
-            onNewFile: () => context.emit('newFile')
+          actionText: 'Upload',
+          actionIcon: 'fas fa-cloud-upload-alt',
+          actionName: 'newFile',
+          actionIconColor: 'white',
+          backgroundColor: '#536DFE',
+          textColor: 'white',
+          onNewFile: () => context.emit('newFile')
         }}/>
       }
 
       const renderNewFolderButton = () => {
         if (isHidden(props.slotNames.btnNewFolder)) return ''
 
-        if(context.slots[props.slotNames.btnNewFolder])
+        if (context.slots[props.slotNames.btnNewFolder])
           return <action-button {...{
             actionText: 'New Folder',
             actionIcon: 'fas fa-plus-circle',
@@ -182,13 +181,13 @@
           }}>{context.slots[props.slotNames.btnNewFolder]()}</action-button>
 
         return <action-button {...{
-            actionText: 'New Folder',
-            actionIcon: 'fas fa-plus-circle',
-            actionName: 'newFolder',
-            outlined: true,
-            textColor: '#536DFE',
-            actionIconColor: '#536DFE',
-            onNewFolder: () => context.emit('newFolder')
+          actionText: 'New Folder',
+          actionIcon: 'fas fa-plus-circle',
+          actionName: 'newFolder',
+          outlined: true,
+          textColor: '#536DFE',
+          actionIconColor: '#536DFE',
+          onNewFolder: () => context.emit('newFolder')
         }}/>
       }
 
@@ -218,8 +217,8 @@
       }
     },
     render() {
-      const { type } = getCurrentInstance()
-      return withScopeId(type.__scopeId)(this.renderToolbar)()
+      const renderWithScopeId = getScopeIdRender();
+      return renderWithScopeId(this.renderToolbar)();
     },
   }
 </script>

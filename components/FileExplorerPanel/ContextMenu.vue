@@ -1,6 +1,6 @@
 <script>
-  import {Fragment} from 'vue-fragment'
-  import {computed, getCurrentInstance, withScopeId} from 'vue'
+  import { computed } from 'vue'
+  import { getScopeIdRender } from "../../utils/get-scope-id-render";
 
   export default {
     name: 'ContextMenu',
@@ -9,9 +9,6 @@
       file: Object,
       fileInClipboard: Object,
       path: String,
-    },
-    components: {
-      Fragment
     },
     data() {
       return {}
@@ -34,13 +31,13 @@
       function renderExtraContextOptions() {
         if (!Array.isArray(props.appendContextOptions) || props.appendContextOptions.length === 0) return null
 
-        return props.appendContextOptions.map(({text, handler}) => (
-                  <div class='context-menu-option' onClick={() => handler(props.file)}>{text}</div>
+        return props.appendContextOptions.map(({ text, handler }) => (
+            <div class='context-menu-option' onClick={() => handler(props.file)}>{text}</div>
         ))
       }
 
       function renderFn() {
-        if (context.slots.default) return context.slots.default({file: props.file})
+        if (context.slots.default) return context.slots.default({ file: props.file })
 
         function createOptionData(action, classes, disabled) {
           if (!classes) classes = {}
@@ -59,9 +56,9 @@
 
         return (
             <div class="context-menu">
-              <div {...createOptionData('open', {'border': true}, !props.file)}>Open</div>
+              <div {...createOptionData('open', { 'border': true }, !props.file)}>Open</div>
               <div {...createOptionData('newFile', null)}>Upload file</div>
-              <div {...createOptionData('newFolder', {'border': true})}>New folder</div>
+              <div {...createOptionData('newFolder', { 'border': true })}>New folder</div>
               <div {...createOptionData('cut', null, !props.file)}>Cut</div>
               <div {...createOptionData('copy', null, !props.file || props.file.isFolder)}>Copy</div>
               <div {...createOptionData('paste', null, !props.fileInClipboard || disablePaste.value)}>Paste</div>
@@ -77,8 +74,8 @@
       };
     },
     render() {
-      const { type } = getCurrentInstance()
-      return withScopeId(type.__scopeId)(this.renderFn)();
+      const renderWithScopeId = getScopeIdRender();
+      return renderWithScopeId(this.renderFn)();
     }
   }
 </script>

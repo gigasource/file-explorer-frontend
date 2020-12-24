@@ -1,11 +1,11 @@
 <script>
   import GIcon from 'pos-vue-framework/src/components/GIcon/GIcon'
   import GBtn from 'pos-vue-framework/src/components/GBtn/GBtn'
-  import {getCurrentInstance, withScopeId} from 'vue'
+  import { getScopeIdRender } from "../../utils/get-scope-id-render";
 
   export default {
     name: 'ActionButton',
-    components: {GIcon, GBtn},
+    components: { GIcon, GBtn },
     props: {
       actionName: String,
       actionIcon: String,
@@ -36,7 +36,7 @@
 
       function renderFn() {
         return context.slots.default &&
-            context.slots.default({[props.actionName]: onAction})
+            context.slots.default({ [props.actionName]: onAction })
             ||
             (
                 <g-btn outlined={props.outlined} class="mx-1 action-btn" disabled={props.disabled} flat
@@ -53,8 +53,8 @@
       }
     },
     render() {
-      const { type } = getCurrentInstance()
-      return withScopeId(type.__scopeId)(this.renderFn)()
+      const renderWithScopeId = getScopeIdRender();
+      return renderWithScopeId(this.renderFn)();
     }
   }
 </script>

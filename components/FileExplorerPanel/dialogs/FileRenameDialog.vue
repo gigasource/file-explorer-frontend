@@ -2,7 +2,7 @@
   <g-dialog v-model="modelValue" persistent width="30%">
     <g-card elevation="16">
       <g-card-title class="dialog">
-        Rename file {{file && file.fileName}}
+        Rename file {{ file && file.fileName }}
       </g-card-title>
       <g-card-text>
         <g-text-field v-model="newFileName" :rules="renameRules"/>
@@ -10,7 +10,7 @@
       <g-card-actions>
         <g-btn background-color="warning" text-color="#ffffff" @click="close">Cancel</g-btn>
         <g-btn background-color="primary" text-color="#ffffff" @click="renameFile"
-               :disabled="this.file && this.files && (newFileName === file.fileName || !!(this.files.find(f => f.fileName === newFileName)))">
+               :disabled="file && files && (newFileName === file.fileName || !!(files.find(f => f.fileName === newFileName)))">
           OK
         </g-btn>
       </g-card-actions>

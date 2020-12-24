@@ -1,5 +1,6 @@
 <script>
-  import {ref, getCurrentInstance, withScopeId} from "vue";
+  import { ref } from "vue";
+  import { getScopeIdRender } from "../../utils/get-scope-id-render";
 
   export default {
     name: 'ViewOption',
@@ -50,21 +51,23 @@
                   nudgeRight: 25,
                   contentClass: `file-explorer-view-option`,
                   'onUpdate:modelValue': e => showMenu.value = e,
-                }} vSlots={{
-                  activator: ({on}) => {
+                }}
+                vSlots={{
+                  activator: ({ on }) => {
                     return (
                         <g-btn class="mx-1 view-option__btn" onClick={on.click} outlined={props.outlined} flat={true}
                                background-color={props.backgroundColor} text-color={props.textColor}
                                disabled={props.disabled}>
                           <g-icon class="file-icon" color="#000000" small>{props.optionIcon}</g-icon>
-                          <span style="margin-left: 10px">{`${props.prependText}${props.selectedOption === null ? capitalize(props.optionType) : selectedOptionText.value}`}</span>
+                          <span
+                              style="margin-left: 10px">{`${props.prependText}${props.selectedOption === null ? capitalize(props.optionType) : selectedOptionText.value}`}</span>
                         </g-btn>
                     )
                   },
                   default: () => {
                     return (
                         <div class="view-option__options">
-                          {props.options.map(({text, value}) => {
+                          {props.options.map(({ text, value }) => {
                             return (
                                 <g-btn class="view-option__option" flat={true} outlined={props.outlined}
                                        background-color={props.backgroundColor} text-color={props.textColor}
@@ -83,8 +86,8 @@
       }
     },
     render() {
-      const { type } = getCurrentInstance()
-      return withScopeId(type.__scopeId)(this.renderFn)()
+      const renderWithScopeId = getScopeIdRender();
+      return renderWithScopeId(this.renderFn)();
     }
   }
 </script>
