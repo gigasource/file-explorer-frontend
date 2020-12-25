@@ -3,7 +3,7 @@
          class="drop-zone-overlay" justify-content="center"
          align-items="center">
     <div class="ta-center">
-      <g-icon class="upload-icon animated infinite bounce" xLarge color="#536DFE" xLarge>fas fa-cloud-upload-alt
+      <g-icon class="upload-icon animated infinite bounce" xLarge color="#536DFE">fas fa-cloud-upload-alt
       </g-icon>
       <div class="mt-3 upload-msg">Drop files/folders here to upload</div>
     </div>
