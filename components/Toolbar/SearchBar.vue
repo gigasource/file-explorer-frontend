@@ -4,12 +4,13 @@
 
   export default {
     name: "Search",
+    emits: ['update:modelValue'],
     props: {
       placeholder: String,
       modelValue: String
     },
     setup(props, context) {
-      const onSearchInput = _.debounce(searchText => context.emit('input', searchText), 250)
+      const onSearchInput = _.debounce(searchText => context.emit('update:modelValue', searchText), 250)
 
       const renderSearchField = function () {
         const fallbackContent = (

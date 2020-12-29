@@ -19,6 +19,7 @@
 <script>
   export default {
     name: "ActionConfirmDialog",
+    emits: ['update:modelValue', 'confirm'],
     props: {
       file: Object,
       modelValue: Boolean,

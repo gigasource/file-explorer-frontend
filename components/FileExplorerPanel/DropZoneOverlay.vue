@@ -15,6 +15,7 @@
 
   export default {
     name: "DropZoneOverlay",
+    emits: ['update:modelValue', 'dropFiles'],
     directives: {
       Droppable
     },

@@ -17,7 +17,10 @@
     directives: {
       Droppable
     },
-    emits: ['open'],
+    emits: [
+        'open', 'cut', 'copy', 'paste', 'rename', 'delete', 'newFile', 'newFolder', 'uploadFiles',
+        'update:showFileUploadProgressDialog', 'removeUploadItem', 'update:uploadingItems',
+    ],
     components: {
       DropZoneOverlay,
       FileUploadProgressDialog,
@@ -54,7 +57,7 @@
 
       function renderFileContainer() {
         const menuData = {
-          value: showContextMenu.value,
+          modelValue: showContextMenu.value,
           closeOnContentClick: true,
           absolute: true,
           contentFillWidth: false,

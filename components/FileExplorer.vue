@@ -12,7 +12,7 @@
   export default {
     name: 'FileExplorer',
     components: { FolderTree, FileExplorerPanel, AddressBar, Toolbar },
-    emits: ['open'],
+    emits: ['open', 'update:viewMode'],
     props: {
       apiHandler: Object,
 

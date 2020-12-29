@@ -5,6 +5,7 @@
 
   export default {
     name: "FolderTree",
+    emits: ['folderSelected'],
     props: {
       folders: Array,
       folderTree: Array,
@@ -31,7 +32,6 @@
       }
 
       const selectedPath = computed(() => {
-        console.log(folderPathToTreePath(props.path));
         return folderPathToTreePath(props.path)
       })
 

@@ -19,7 +19,7 @@
       draggable: Boolean,
       fileNameDisplayMaxLength: Number,
     },
-    emits: ['click', 'dblclick', 'contextmenu', 'updateFileName'],
+    emits: ['click', 'dblclick', 'contextmenu'],
     setup(props, context) {
       function renderFileIcon() {
         const fileIconSrc = props.file.thumbnailUrl || props.file.viewUrl

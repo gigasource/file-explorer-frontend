@@ -3,6 +3,7 @@
 
   export default {
     name: 'ViewMode',
+    emits: ['update:viewMode'],
     props: {
       disabled: Boolean,
       outlined: Boolean,

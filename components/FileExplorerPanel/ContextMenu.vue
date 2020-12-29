@@ -15,18 +15,9 @@
     },
     emits: ['open', 'newFile', 'newFolder', 'cut', 'copy', 'paste', 'delete', 'rename'],
     setup(props, context) {
-      const contextOptionClasses = {
-        option: 'context-menu-option',
-        borderedOption: 'border',
-      }
-
       const disablePaste = computed(() => {
         return props.path.startsWith(props.fileInClipboard.folderPath + props.fileInClipboard.fileName + '/')
       });
-
-      function renderBaseContextOptions() {
-
-      }
 
       function renderExtraContextOptions() {
         if (!Array.isArray(props.appendContextOptions) || props.appendContextOptions.length === 0) return null

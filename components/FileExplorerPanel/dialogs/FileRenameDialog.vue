@@ -21,6 +21,7 @@
 <script>
   export default {
     name: "FileRenameDialog.vue",
+    emits: ['update:modelValue', 'rename'],
     props: {
       modelValue: Boolean,
       files: Array,

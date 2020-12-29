@@ -8,6 +8,7 @@
 
   export default {
     components: { AddressBar, ActionButton, ViewOption, ViewMode, SearchBar },
+    emits: ['up', 'update:viewMode', 'update:sort', 'update:searchText', 'newFile', 'newFolder'],
     props: {
       selectedViewMode: String,
       selectedFilter: String,

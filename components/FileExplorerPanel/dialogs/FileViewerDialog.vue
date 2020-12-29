@@ -49,6 +49,7 @@
 
   export default {
     name: "FileViewerDialog",
+    emits: ['close'],
     props: {
       file: Object,
       showDialog: Boolean,

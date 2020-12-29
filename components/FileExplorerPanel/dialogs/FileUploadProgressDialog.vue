@@ -53,6 +53,7 @@
   export default {
     name: "FileUploadProgressDialog",
     components: { ActionConfirmDialog },
+    emits: ['update:uploadingItems', 'update:modelValue', 'removeUploadItem'],
     props: {
       modelValue: Boolean,
       width: {

@@ -6,6 +6,7 @@
 
   export default {
     name: 'AddressBar',
+    emits: ['update:path'],
     props: {
       path: String,
       divider: String,
