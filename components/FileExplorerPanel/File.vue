@@ -156,7 +156,7 @@
       padding: 2px 5px;
     }
 
-    .file-name-edit ::v-deep {
+    .file-name-edit :deep {
       display: flex;
       justify-content: center;
 

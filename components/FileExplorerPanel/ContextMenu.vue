@@ -72,7 +72,7 @@
 </script>
 
 <style lang="scss" scoped>
-  ::v-deep .context-menu {
+  :deep .context-menu {
     z-index: 100;
     border: 1px solid #9E9E9E;
     box-shadow: -1px 1px 6px rgba(0, 0, 0, 0.19);

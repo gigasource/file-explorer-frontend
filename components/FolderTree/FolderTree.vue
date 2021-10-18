@@ -98,7 +98,7 @@
 </script>
 
 <style scoped lang="scss">
-  .folder-tree ::v-deep {
+  .folder-tree :deep {
     .g-treeview-item {
       border: 1px solid transparent;
       font-weight: bold;

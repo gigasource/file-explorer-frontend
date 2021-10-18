@@ -107,11 +107,11 @@
     margin: 0 0.25rem !important;
     color: #212121;
 
-    ::v-deep .g-breadcrumbs-divider {
+    :deep .g-breadcrumbs-divider {
       padding: 0 4px !important;
     }
 
-    ::v-deep .breadcrumb-item {
+    :deep .breadcrumb-item {
       display: flex;
       align-items: center;
       cursor: pointer;

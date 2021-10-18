@@ -315,7 +315,7 @@
     &--empty {
     }
 
-    ::v-deep .file-container {
+    :deep .file-container {
       &--grid {
         display: grid;
         grid-gap: 0.33%;
