@@ -65,7 +65,7 @@ function createGridFsHandlers(options) {
 
     function onUploadProgress(progress) {
       upload.progress = Math.round(progress.loaded * 100 / progress.total)
-      uploadProgressCallback(upload);
+      uploadProgressCallback && uploadProgressCallback(upload);
     }
 
     let responseData
