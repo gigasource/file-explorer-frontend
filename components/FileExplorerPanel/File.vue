@@ -1,14 +1,16 @@
 <script>
   import ContextMenu from "./ContextMenu"
-  import { Draggable } from "pos-vue-framework"
+  import Draggable from '../pvf/directives/drag-and-drop/draggable';
   import videoThumbGridItem from '../../assets/images/video-thumb-grid-item.svg'
   import folderImage from '../../assets/images/folder-image.svg'
   import { getScopeIdRender } from "../../utils/get-scope-id-render";
+  import GIcon from '../pvf/components/GIcon/GIcon';
+
 
   export default {
     name: 'File',
     directives: { Draggable },
-    components: { ContextMenu },
+    components: { ContextMenu, GIcon },
     props: {
       file: Object,
       selected: {

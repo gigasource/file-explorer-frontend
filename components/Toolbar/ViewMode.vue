@@ -1,9 +1,13 @@
 <script>
   import { getScopeIdRender } from "../../utils/get-scope-id-render";
+  import GItemGroup from '../pvf/components/GItemGroup/GItemGroup';
+  import GIcon from '../pvf/components/GIcon/GIcon';
+  import GBtnBs from '../pvf/components/GBtn/GBtnBs';
 
   export default {
     name: 'ViewMode',
     emits: ['update:viewMode'],
+    components: {GItemGroup, GIcon, GBtnBs},
     props: {
       disabled: Boolean,
       outlined: Boolean,
@@ -30,7 +34,7 @@
             || <g-item-group class="view-mode mx-1">
               {viewModes.map(mode => {
                 return (
-                    <g-btn {...{
+                    <g-btn-bs {...{
                       class: {
                         'view-mode--selection': true,
                         [`view-mode--${mode}`]: true,
@@ -45,7 +49,7 @@
                       <g-icon class="file-icon"
                               color={props.selectedViewMode === mode ? 'white' : 'black'}
                               small>{mode === 'grid' ? 'fas fa-th' : 'fas fa-list'}</g-icon>
-                    </g-btn>
+                    </g-btn-bs>
                 )
               })}
             </g-item-group>

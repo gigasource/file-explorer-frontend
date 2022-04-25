@@ -20,9 +20,9 @@
         <div class="upload-item__progress"
              @mouseenter="mouseEnterUploadProgress(uploadItem)"
              @mouseleave="mouseLeaveUploadProgress(uploadItem)">
-          <g-btn icon v-if="uploadItem.hovered && !uploadItem.success" small @click="cancelUpload(uploadItem)">
+          <g-btn-bs icon v-if="uploadItem.hovered && !uploadItem.success" small @click="cancelUpload(uploadItem)">
             <g-icon color="#757575" medium>fas fa-times-circle</g-icon>
-          </g-btn>
+          </g-btn-bs>
           <g-progress-circular v-else-if="uploadItem.inProgress" class="upload-item__progress--uploading" size="25"
                                color="#536DFE" :value="uploadItem.progress"/>
           <div v-else-if="uploadItem.success" class="upload-item__progress--finished">
@@ -46,13 +46,18 @@
 </template>
 
 <script>
+  import GDialog from '../../pvf/components/GDialog/GDialog';
+  import GIcon from '../../pvf/components/GIcon/GIcon';
+  import GSpacer from '../../pvf/components/GLayout/GSpacer';
+  import GProgressCircular from '../../pvf/components/GProgressCircular/GProgressCircular';
+  import GBtnBs from '../../pvf/components/GBtn/GBtnBs';
   import ActionConfirmDialog from "./ActionConfirmDialog";
   import uploadCompleted from '../../../assets/images/upload-completed.svg';
   import uploadFailed from '../../../assets/images/upload-failed.svg';
 
   export default {
     name: "FileUploadProgressDialog",
-    components: { ActionConfirmDialog },
+    components: { GDialog, GIcon, GSpacer, GProgressCircular, GBtnBs, ActionConfirmDialog },
     emits: ['update:uploadingItems', 'update:modelValue', 'removeUploadItem'],
     props: {
       modelValue: Boolean,

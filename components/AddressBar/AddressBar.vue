@@ -3,10 +3,12 @@
   import fileExplorerPathFolder from '../../assets/images/file-explorer-path-folder.svg'
   import fileExplorerPathSeparator from '../../assets/images/file-explorer-path-separator.svg';
   import { getScopeIdRender } from '../../utils/get-scope-id-render.js';
+  import GBreadcrumbs from '../pvf/components/GBreadcrumbs/GBreadcrumbs';
 
   export default {
     name: 'AddressBar',
     emits: ['update:path'],
+    components: {GBreadcrumbs},
     props: {
       path: String,
       divider: String,

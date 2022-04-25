@@ -1,27 +1,32 @@
 <template>
   <g-dialog v-model="modelValue" persistent width="30%">
-    <g-card elevation="16">
-      <g-card-title class="dialog">
+    <div elevation="16">
+      <div class="dialog">
         Rename file {{ file && file.fileName }}
-      </g-card-title>
-      <g-card-text>
-        <g-text-field v-model="newFileName" :rules="renameRules"/>
-      </g-card-text>
-      <g-card-actions>
-        <g-btn background-color="warning" text-color="#ffffff" @click="close">Cancel</g-btn>
-        <g-btn background-color="primary" text-color="#ffffff" @click="renameFile"
+      </div>
+      <div>
+        <input v-model="newFileName"/>
+      </div>
+      <div>
+        <g-btn-bs background-color="warning" text-color="#ffffff" @click="close">Cancel</g-btn-bs>
+        <g-btn-bs background-color="primary" text-color="#ffffff" @click="renameFile"
                :disabled="file && files && (newFileName === file.fileName || !!(files.find(f => f.fileName === newFileName)))">
           OK
-        </g-btn>
-      </g-card-actions>
-    </g-card>
+        </g-btn-bs>
+      </div>
+    </div>
   </g-dialog>
 </template>
 
 <script>
+  import GDialog from '../../pvf/components/GDialog/GDialog';
+  import GBtnBs from '../../pvf/components/GBtn/GBtnBs';
+  import GTextField from '../../pvf/components/GInput/GTextField';
+
   export default {
     name: "FileRenameDialog.vue",
     emits: ['update:modelValue', 'rename'],
+    components: {GDialog, GBtnBs, GTextField},
     props: {
       modelValue: Boolean,
       files: Array,
@@ -51,6 +56,3 @@
     }
   }
 </script>
-
-<style scoped lang="scss">
-</style>

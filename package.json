@@ -6,11 +6,9 @@
     "build": "vue-cli-service build"
   },
   "main": "components/FileExplorer.vue",
-  "peerDependencies": {
-    "pos-vue-framework": "github:gigasource/pos-vue-framework"
-  },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.11.2",
+    "@juggle/resize-observer": "^3.3.1",
     "@vue/babel-plugin-jsx": "^1.0.0-rc.3",
     "@vue/cli": "^4.5.9",
     "@vue/compiler-sfc": "^3.0.4",

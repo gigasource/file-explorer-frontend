@@ -1,0 +1,200 @@
+<script>
+  import { computed } from 'vue';
+  import {convertToUnit, getScopeIdRender} from '../../utils/helpers';
+  import { setTextColor } from '../../mixins/colorable';
+  import { startsWith } from 'lodash'
+
+  export default {
+    name: 'GIcon',
+    // inheritAttrs: false,
+    props: {
+      // size props
+      size: [Number, String],
+      xSmall: Boolean,
+      small: Boolean,
+      medium: Boolean,
+      large: Boolean,
+      xLarge: Boolean,
+
+      // appearance props
+      dense: Boolean,
+      left: Boolean,
+      right: Boolean,
+      color: [String],
+      disabled: Boolean,
+
+      // data props
+      value: String,
+      svg: Boolean,
+    },
+    setup: function (props, context) {
+      // const onClick = (event) => context.emit('click', event)
+      const iconColor = computed(() => setTextColor(props.color))
+
+      function genFontAwesomeIcon(icon, iconClass, iconStyle) {
+        iconClass[icon] = true
+        return <i class={iconClass}
+                  style={iconStyle}/>
+      }
+
+      function genMaterialIcon(icon, iconClass, iconStyle) {
+        let iconType = 'material-icons'
+        const delimiterIndex = icon.indexOf('-')
+        const isMdiIcon = !(delimiterIndex <= -1)
+        if (isMdiIcon) {
+          iconType = icon.slice(0, delimiterIndex)
+          iconClass[icon] = true
+        }
+
+        iconClass[iconType] = true
+        return <i class={iconClass}
+                  style={iconStyle}>{!isMdiIcon ? icon : ''}</i>
+      }
+
+      function genSvgIcon(svgName, iconClass, iconStyle) {
+        iconClass['g-icon__svg'] = true
+        iconClass[svgName] = true
+        iconStyle['width'] = iconStyle['font-size']
+        iconStyle['height'] = iconStyle['font-size']
+
+        return <div class={iconClass}
+                    style={iconStyle}/>
+      }
+
+      function genBase64Icon(base64, iconClass, iconStyle) {
+        iconStyle['width'] = iconStyle['font-size']
+        iconStyle['height'] = iconStyle['font-size']
+        return <img src={base64} alt="" class={iconClass} style={iconStyle}/>
+      }
+
+      function genIcon(icon) {
+        // const hasClickListener = !!(getCurrentInstance().vnode.props && getCurrentInstance().vnode.props.onClick);
+
+        let iconName = '';
+        let iconSize;
+        const iconClass = {
+          ...iconColor.value.class,
+          'g-icon': true,
+          'g-icon__dense': props.dense,
+          'g-icon__disabled': props.disabled,
+          'g-icon__left': props.left,
+          'g-icon__right': props.right,
+          // 'g-icon__link': hasClickListener,
+        }
+
+        let isBase64Image = false;
+        if (typeof icon === 'string') {
+          if (icon.includes('@')) {
+            const info = icon.split('@')
+            iconName = info[0]
+            iconSize = info[1]
+          } else if (icon.includes('base64')) {
+            isBase64Image = true
+            iconName = icon
+          } else {
+            iconName = icon
+          }
+        } else {
+          iconName = icon
+        }
+
+        const iconStyle = {
+          ...iconColor.value.style,
+          'font-size': iconSize ? convertToUnit(iconSize) : getSize(props),
+        }
+
+        if (isBase64Image) return genBase64Icon(icon, iconClass, iconStyle)
+        if (props.svg || isCustomSVGIcon(iconName)) return genSvgIcon(iconName, iconClass, iconStyle)
+        if (isFontAwesome5(iconName)) return genFontAwesomeIcon(iconName, iconClass, iconStyle)
+        return genMaterialIcon(iconName, iconClass, iconStyle)
+      }
+
+      return {
+        genIcon
+      }
+    },
+
+    render() {
+      const defaultSlot = this.$slots.default()
+      const defaultSlotChildren = defaultSlot &&
+          (defaultSlot.find(node => (typeof node.children === 'string' && node.children.trim() !== '')) || defaultSlot[0]).children
+      const icon = typeof defaultSlotChildren === 'string' ? defaultSlotChildren.trim() : 'none'
+      const scopeIdRender = getScopeIdRender();
+      return scopeIdRender(this.genIcon)(icon);
+    }
+  }
+
+  function isFontAwesome5(icon) {
+    return ['fas', 'far', 'fal', 'fab'].some(val => icon.includes(val))
+  }
+
+  function isCustomSVGIcon(icon) {
+    return startsWith(icon, 'icon-')
+  }
+
+  function getSize(props) {
+    if (props.xSmall) return '12px'
+    if (props.small) return '16px'
+    if (props.medium) return '28px'
+    if (props.large) return '36px'
+    if (props.xLarge) return '40px'
+    if (props.size) return convertToUnit(props.size)
+    return '24px'
+  }
+</script>
+
+<style scoped lang="scss">
+$icon-size: 24px !default;
+$icon-size-dense: 20px !default;
+
+.g-icon {
+  align-items: center;
+  display: inline-flex;
+  font-feature-settings: 'liga';
+  font-size: $icon-size;
+  justify-content: center;
+  letter-spacing: normal;
+  line-height: 1;
+  text-indent: 0;
+  transition: default;
+  vertical-align: middle;
+  user-select: none;
+  color: rgba(0, 0, 0, 0.54);
+
+  &__right {
+    margin-left: 16px;
+  }
+
+  &__left {
+    margin-right: 16px;
+  }
+
+  &__link {
+    cursor: pointer;
+  }
+
+  &__disabled {
+    pointer-events: none;
+    opacity: .6;
+  }
+
+  &__is-component {
+    height: $icon-size;
+    width: $icon-size;
+  }
+
+  &__svg {
+    height: $icon-size;
+    width: $icon-size;
+    fill: currentColor;
+  }
+
+  &__dense {
+    font-size: $icon-size-dense;
+
+    &__is-component {
+      height: $icon-size-dense;
+    }
+  }
+}
+</style>

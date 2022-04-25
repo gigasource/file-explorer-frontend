@@ -2,10 +2,12 @@
   import { computed } from 'vue'
   import { folderArrayToFolderParth, folderPathToFolderArray } from '../../utils/file-path'
   import { getScopeIdRender } from "../../utils/get-scope-id-render";
+  import GSideBarTreeView from '../pvf/components/GSidebar/GSideBarTreeView';
 
   export default {
     name: "FolderTree",
     emits: ['folderSelected'],
+    components: {GSideBarTreeView},
     props: {
       folders: Array,
       folderTree: Array,

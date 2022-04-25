@@ -1,9 +1,13 @@
 <script>
   import { ref } from "vue";
   import { getScopeIdRender } from "../../utils/get-scope-id-render";
+  import GMenu from '../pvf/components/GMenu/GMenu';
+  import GBtnBs from '../pvf/components/GBtn/GBtnBs';
+  import GIcon from '../pvf/components/GIcon/GIcon';
 
   export default {
     name: 'ViewOption',
+    components: {GMenu, GBtnBs, GIcon},
     props: {
       disabled: Boolean,
       prependText: {
@@ -55,13 +59,12 @@
                 vSlots={{
                   activator: ({ on }) => {
                     return (
-                        <g-btn class="mx-1 view-option__btn" onClick={on.click} outlined={props.outlined} flat={true}
+                        <g-btn-bs class="mx-1 view-option__btn" onClick={on.click} outlined={props.outlined} flat={true}
                                background-color={props.backgroundColor} text-color={props.textColor}
                                disabled={props.disabled}>
                           <g-icon class="file-icon" color="#000000" small>{props.optionIcon}</g-icon>
-                          <span
-                              style="margin-left: 10px">{`${props.prependText}${props.selectedOption === null ? capitalize(props.optionType) : selectedOptionText.value}`}</span>
-                        </g-btn>
+                          <span style="margin-left: 10px">{`${props.prependText}${props.selectedOption === null ? capitalize(props.optionType) : selectedOptionText.value}`}</span>
+                        </g-btn-bs>
                     )
                   },
                   default: () => {
@@ -69,10 +72,10 @@
                         <div class="view-option__options">
                           {props.options.map(({ text, value }) => {
                             return (
-                                <g-btn class="view-option__option" flat={true} outlined={props.outlined}
+                                <g-btn-bs class="view-option__option" flat={true} outlined={props.outlined}
                                        background-color={props.backgroundColor} text-color={props.textColor}
                                        disabled={props.disabled}
-                                       onClick={() => onOptionSelected(value, text)}>{text}</g-btn>
+                                       onClick={() => onOptionSelected(value, text)}>{text}</g-btn-bs>
                             )
                           })}
                         </div>

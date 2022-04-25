@@ -8,8 +8,12 @@
 </template>
 
 <script>
+  import GOverlay from '../pvf/components/GOverlay/GOverlay';
+  import GProgressCircular from '../pvf/components/GProgressCircular/GProgressCircular';
+
   export default {
     name: "LoadingOverlay",
+    components: {GOverlay, GProgressCircular},
     props: {
       value: Boolean,
       message: String,

@@ -11,11 +11,14 @@
 </template>
 
 <script>
-  import {Droppable} from "pos-vue-framework";
+  import Droppable from '../pvf/directives/drag-and-drop/droppable';
+  import GRow from '../pvf/components/GLayout/GRow';
+  import GIcon from '../pvf/components/GIcon/GIcon';
 
   export default {
     name: "DropZoneOverlay",
     emits: ['update:modelValue', 'dropFiles'],
+    components: { GRow, GIcon },
     directives: {
       Droppable
     },

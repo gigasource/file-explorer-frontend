@@ -1,25 +1,28 @@
 <template>
   <g-dialog v-model="modelValue" persistent width="30%">
-    <g-card elevation="16">
-      <g-card-title class="dialog">
+    <div elevation="16">
+      <div class="dialog">
         {{dialogTitle}}
-      </g-card-title>
-      <g-card-text class="ta-center">
+      </div>
+      <div class="ta-center">
         <h5>{{dialogText}}</h5>
-      </g-card-text>
-      <g-card-actions>
-        <g-btn background-color="warning" text-color="#ffffff" @click="close">{{cancelActionText}}</g-btn>
-        <g-btn background-color="primary" text-color="#ffffff" @click="doAction">{{confirmActionText}}
-        </g-btn>
-      </g-card-actions>
-    </g-card>
+      </div>
+      <div>
+        <g-btn-bs background-color="warning" text-color="#ffffff" @click="close">{{cancelActionText}}</g-btn-bs>
+        <g-btn-bs background-color="primary" text-color="#ffffff" @click="doAction">{{confirmActionText}}</g-btn-bs>
+      </div>
+    </div>
   </g-dialog>
 </template>
 
 <script>
+  import GDialog from '../../pvf/components/GDialog/GDialog';
+  import GBtnBs from '../../pvf/components/GBtn/GBtnBs';
+
   export default {
     name: "ActionConfirmDialog",
     emits: ['update:modelValue', 'confirm'],
+    components: { GDialog, GBtnBs },
     props: {
       file: Object,
       modelValue: Boolean,
@@ -45,7 +48,3 @@
     },
   }
 </script>
-
-<style scoped lang="scss">
-
-</style>

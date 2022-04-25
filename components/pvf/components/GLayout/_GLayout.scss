@@ -1,0 +1,33 @@
+.g-layout {
+  display: flex;
+  flex-wrap: nowrap;
+  margin: 0;
+
+  &__vertical {
+    flex-direction: column;
+  }
+
+  &__horizontal {
+    flex-direction: row;
+  }
+
+  .g-layout {
+    padding: 12px;
+    margin: 0;
+  }
+
+  &.no-gutters {
+    margin: 0;
+
+    .g-layout {
+      padding: 0;
+    }
+  }
+
+  &:not([class*=col-]):not([class*=row-]) {
+    flex: 1;
+  }
+}
+
+
+

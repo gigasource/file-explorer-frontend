@@ -5,6 +5,7 @@
   export default {
     name: "Search",
     emits: ['update:modelValue'],
+    components: {GTextField},
     props: {
       placeholder: String,
       modelValue: String
@@ -14,7 +15,7 @@
 
       const renderSearchField = function () {
         const fallbackContent = (
-            <g-text-field class="mx-1 search row-flex align-items-center br-2 pa-1"
+            <input class="mx-1 search row-flex align-items-center br-2 pa-1"
                           {...{
                             type: "text",
                             prependInnerIcon: "search",

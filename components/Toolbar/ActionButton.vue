@@ -1,11 +1,11 @@
 <script>
-  import GIcon from 'pos-vue-framework/src/components/GIcon/GIcon'
-  import GBtn from 'pos-vue-framework/src/components/GBtn/GBtn'
   import { getScopeIdRender } from "../../utils/get-scope-id-render";
+  import GIcon from '../pvf/components/GIcon/GIcon';
+  import GBtnBs from '../pvf/components/GBtn/GBtnBs';
 
   export default {
     name: 'ActionButton',
-    components: { GIcon, GBtn },
+    components: { GIcon, GBtnBs },
     props: {
       actionName: String,
       actionIcon: String,
@@ -39,12 +39,12 @@
             context.slots.default({ [props.actionName]: onAction })
             ||
             (
-                <g-btn outlined={props.outlined} class="mx-1 action-btn" disabled={props.disabled} flat
+                <g-btn-bs outlined={props.outlined} class="mx-1 action-btn" disabled={props.disabled} flat
                        background-color={props.backgroundColor} text-color={props.textColor}
                        onClick={() => context.emit(props.actionName)}>
                   <g-icon class="action-btn__icon" color={props.actionIconColor} small>{props.actionIcon}</g-icon>
                   <span style="margin-left: 10px">{capitalize(props.actionText)}</span>
-                </g-btn>
+                </g-btn-bs>
             )
       }
 

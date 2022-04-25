@@ -6,11 +6,14 @@
   import FileRenameDialog from './dialogs/FileRenameDialog'
   import ActionConfirmDialog from "./dialogs/ActionConfirmDialog"
   import FileUploadProgressDialog from "./dialogs/FileUploadProgressDialog";
-  import { Droppable } from "pos-vue-framework";
+  import Droppable from '../pvf/directives/drag-and-drop/droppable';
   import DropZoneOverlay from "./DropZoneOverlay";
+  import GIcon from '../pvf/components/GIcon/GIcon';
+  import GMenu from '../pvf/components/GMenu/GMenu';
   import _ from 'lodash'
   import emptyFolder from '../../assets/images/empty_folder.svg'
   import { getScopeIdRender } from "../../utils/get-scope-id-render";
+
 
   export default {
     name: 'FileExplorerPanel',
@@ -29,6 +32,8 @@
       FileViewerDialog,
       File,
       ContextMenu,
+      GIcon,
+      GMenu
     },
     props: {
       files: [Array, Object],

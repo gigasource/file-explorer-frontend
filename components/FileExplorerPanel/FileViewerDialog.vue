@@ -1,14 +1,14 @@
 <template>
   <g-dialog v-if="file" v-model="showDialog" :height="600" :width="900" persistent>
-    <g-card class="file-viewer-dialog">
-      <g-card-title class="file-viewer-dialog__title px-5 pt-4">
+    <div class="file-viewer-dialog">
+      <div class="file-viewer-dialog__title px-5 pt-4">
         <div class="cs-dialog__title">{{ file.fileName }}</div>
         <g-spacer/>
-        <g-btn icon>
+        <g-btn-bs>
           <g-icon color="#7d7d7d" @click="close" medium>fas fa-times</g-icon>
-        </g-btn>
-      </g-card-title>
-      <g-card-text class="mt-2 px-4">
+        </g-btn-bs>
+      </div>
+      <div class="mt-2 px-4">
         <g-row class="file-description">
           <g-col cols="3">
             <span>Format: </span>
@@ -33,13 +33,13 @@
           <img v-else-if="isImageFile" id="image" draggable="false"/>
           <embed v-else :src="file.viewUrl" width="100%" height="500px"/>
         </g-row>
-      </g-card-text>
-      <g-card-actions class="pb-4">
+      </div>
+      <div class="pb-4">
         <g-row justify-content="center">
-          <g-btn depressed><a :href="file.downloadUrl" download>Download</a></g-btn>
+          <g-btn-bs depressed><a :href="file.downloadUrl" download>Download</a></g-btn-bs>
         </g-row>
-      </g-card-actions>
-    </g-card>
+      </div>
+    </div>
   </g-dialog>
 </template>
 
