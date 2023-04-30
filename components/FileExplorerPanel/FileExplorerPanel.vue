@@ -87,7 +87,7 @@
                   <div class="fill-height" {...contextMenuListener}>
                     <div {...containerData}>
                       {props.files.map(f => {
-                        return <div>
+                        return <div key={f._id}>
                           {renderFile(f, toggleContextMenu)}
                         </div>
                       })}
