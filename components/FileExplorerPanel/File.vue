@@ -42,7 +42,7 @@
       function renderFileName() {
         let fileName = props.file.fileName
 
-        if (fileName.length > props.fileNameDisplayMaxLength) {
+        if (props.viewMode === 'grid' && fileName.length > props.fileNameDisplayMaxLength) {
           const numberOfLeftChars = Math.ceil(props.fileNameDisplayMaxLength / 2)
           const numberOfRightChars = Math.floor(props.fileNameDisplayMaxLength / 2)
 
