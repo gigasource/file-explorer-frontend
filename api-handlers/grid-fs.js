@@ -1,6 +1,7 @@
 import createCommonApiHandlers from './common'
 import forEach from 'lodash/forEach'
 import ax from 'axios'
+import {ref} from 'vue'
 
 const CancelToken = ax.CancelToken;
 
@@ -55,32 +56,33 @@ function createGridFsHandlers(options) {
 
     const source = CancelToken.source()
 
-    const upload = {
+    const upload = ref({
       progress: 0,
       inProgress: true,
       cancel: source.cancel,
       mimeType: file.type,
       fileName: file.name,
-    }
+    })
 
     function onUploadProgress(progress) {
-      upload.progress = Math.round(progress.loaded * 100 / progress.total)
-      uploadProgressCallback && uploadProgressCallback(upload);
+      const progressPt = Math.round(progress.loaded * 100 / progress.total)
+      upload.value.progress = progressPt
+      uploadProgressCallback && uploadProgressCallback(progressPt);
     }
 
     let responseData
     axios.post(apiUrl, formData, { cancelToken: source.token, onUploadProgress })
         .then(async (response) => {
-          upload.progress = 100
-          upload.success = true
+          upload.value.progress = 100
+          upload.value.success = true
           responseData = response
         })
         .catch(() => {
-          upload.progress = 0
-          upload.success = false
+          upload.value.progress = 0
+          upload.value.success = false
         })
         .finally(() => {
-          upload.inProgress = false
+          upload.value.inProgress = false
           uploadCompletedCallback(responseData)
         })
 
