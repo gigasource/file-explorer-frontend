@@ -38,7 +38,7 @@
       }
     },
     render() {
-      return this.renderSearchField;
+      return this.renderSearchField();
     }
   }
 </script>
