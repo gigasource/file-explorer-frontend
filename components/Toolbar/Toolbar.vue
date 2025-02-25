@@ -149,9 +149,8 @@
             actionText: 'Upload',
             actionIcon: 'fas fa-cloud-upload-alt',
             actionName: 'newFile',
-            actionIconColor: 'white',
-            backgroundColor: '#536DFE',
-            textColor: 'white',
+            textColor: '#536DFE',
+            actionIconColor: '#536DFE',
             onNewFile: () => context.emit('newFile')
           }}>{context.slots[props.slotNames.btnNewFile]()}</action-button>
 
@@ -159,9 +158,8 @@
           actionText: 'Upload',
           actionIcon: 'fas fa-cloud-upload-alt',
           actionName: 'newFile',
-          actionIconColor: 'white',
-          backgroundColor: '#536DFE',
-          textColor: 'white',
+          textColor: '#536DFE',
+          actionIconColor: '#536DFE',
           onNewFile: () => context.emit('newFile')
         }}/>
       }
@@ -174,7 +172,6 @@
             actionText: 'New Folder',
             actionIcon: 'fas fa-plus-circle',
             actionName: 'newFolder',
-            outlined: true,
             textColor: '#536DFE',
             actionIconColor: '#536DFE',
             onNewFolder: () => context.emit('newFolder')
@@ -184,7 +181,6 @@
           actionText: 'New Folder',
           actionIcon: 'fas fa-plus-circle',
           actionName: 'newFolder',
-          outlined: true,
           textColor: '#536DFE',
           actionIconColor: '#536DFE',
           onNewFolder: () => context.emit('newFolder')
