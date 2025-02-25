@@ -1,9 +1,8 @@
 <script>
   import _ from 'lodash';
-  import { getScopeIdRender } from "../../utils/get-scope-id-render";
 
   export default {
-    name: "Search",
+    name: "SearchBar",
     emits: ['update:modelValue'],
     props: {
       placeholder: String,
@@ -20,7 +19,7 @@
                             prependInnerIcon: "search",
                             solo: true,
                             flat: true,
-                            modelValue: props.searchText,
+                            modelValue: props.modelValue,
                             'onUpdate:modelValue': onSearchInput,
                             placeholder: props.placeholder
                           }}/>
@@ -28,7 +27,7 @@
 
         return (context.slots.default && context.slots.default({
               onSearchInput,
-              searchText: props.searchText,
+              searchText: props.modelValue,
               placeholder: props.placeholder
             }))
             || fallbackContent
@@ -39,8 +38,7 @@
       }
     },
     render() {
-      const renderWithScopeId = getScopeIdRender();
-      return renderWithScopeId(this.renderSearchField)();
+      return this.renderSearchField;
     }
   }
 </script>
