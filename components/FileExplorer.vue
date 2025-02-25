@@ -162,7 +162,6 @@
               selectedSort: fileSort.value,
               viewMode: viewMode.value,
               path: path.value,
-
               searchText: searchText.value,
               slotNames: { ...toolbarSlots, ...addressBarSlots },
               addressBarDivider: props.addressBarDivider,
@@ -258,6 +257,9 @@
             'onUpdate:uploadingItems': items => uploadingItems.value = items,
             'onUpdate:showFileUploadProgressDialog': value => showFileUploadProgressDialog.value = value,
             onOpen: file => {
+              if (file.isFolder) {
+                searchText.value = ''
+              }
               openFile(file)
               context.emit('open', file)
             },
