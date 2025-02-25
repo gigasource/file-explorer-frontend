@@ -20,6 +20,7 @@
         type: String,
         default: '->',
       },
+      searchText: String,
       hideComponents: Array,
       addressBarVNode: Object,
     },
