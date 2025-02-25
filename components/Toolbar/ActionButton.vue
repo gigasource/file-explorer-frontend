@@ -43,7 +43,7 @@
                        background-color={props.backgroundColor} text-color={props.textColor}
                        onClick={() => context.emit(props.actionName)}>
                   <g-icon class="action-btn__icon" color={props.actionIconColor} small>{props.actionIcon}</g-icon>
-                  <span style="margin-left: 10px">{capitalize(props.actionText)}</span>
+                  {props.actionText && <span style="margin-left: 10px">{capitalize(props.actionText)}</span>}
                 </g-btn>
             )
       }
@@ -62,5 +62,6 @@
 <style scoped lang="scss">
   .action-btn {
     height: 70% !important;
+    padding: 0 12px !important;
   }
 </style>

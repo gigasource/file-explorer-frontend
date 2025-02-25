@@ -35,7 +35,6 @@
 
         if (context.slots[props.slotNames.btnBack])
           return <action-button {...{
-            actionText: 'Up',
             actionIcon: 'fas fa-arrow-up',
             actionName: 'up',
             disabled: props.path === '/',
@@ -43,7 +42,6 @@
           }}>{context.slots[props.slotNames.btnBack]()}</action-button>
 
         return <action-button {...{
-          actionText: 'Up',
           actionIcon: 'fas fa-arrow-up',
           actionName: 'up',
           disabled: props.path === '/',
