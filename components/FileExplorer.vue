@@ -15,7 +15,7 @@
     emits: ['open', 'update:viewMode'],
     props: {
       apiHandler: Object,
-
+      defaultPath: String,
       accept: String,
       appendContextOptions: Array,
       addressBarDivider: {
@@ -70,7 +70,7 @@
       const fileSort = ref('az')
       const searchText = ref('')
 
-      const path = ref('/')
+      const path = ref(props.defaultPath || '/')
       const files = ref(null)
       const folderTree = ref(null)
 
