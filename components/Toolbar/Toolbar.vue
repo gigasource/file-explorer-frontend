@@ -146,7 +146,7 @@
 
         if (context.slots[props.slotNames.btnNewFile])
           return <action-button {...{
-            actionText: 'Upload',
+            actionText: '',
             actionIcon: 'fas fa-cloud-upload-alt',
             actionName: 'newFile',
             textColor: '#536DFE',
@@ -155,7 +155,7 @@
           }}>{context.slots[props.slotNames.btnNewFile]()}</action-button>
 
         return <action-button {...{
-          actionText: 'Upload',
+          actionText: '',
           actionIcon: 'fas fa-cloud-upload-alt',
           actionName: 'newFile',
           textColor: '#536DFE',
@@ -169,7 +169,7 @@
 
         if (context.slots[props.slotNames.btnNewFolder])
           return <action-button {...{
-            actionText: 'New Folder',
+            actionText: '',
             actionIcon: 'fas fa-plus-circle',
             actionName: 'newFolder',
             textColor: '#536DFE',
@@ -178,7 +178,7 @@
           }}>{context.slots[props.slotNames.btnNewFolder]()}</action-button>
 
         return <action-button {...{
-          actionText: 'New Folder',
+          actionText: '',
           actionIcon: 'fas fa-plus-circle',
           actionName: 'newFolder',
           textColor: '#536DFE',
