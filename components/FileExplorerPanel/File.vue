@@ -61,11 +61,9 @@
           fileName = fileName.substring(0, numberOfLeftChars) + '...' + fileName.substring(fileName.length - numberOfRightChars)
         }
 
-        return props.viewMode === 'grid' ? (
-            <span class="file-name">
-              {fileName}
-            </span>
-        ) : (
+        if (props.viewMode === 'grid') return <span className="file-name">{fileName}</span>
+        if (props.file.isFolder) return <div> <p>Name: {fileName}</p> <p>Date: {props.file.createdDate}</p> </div>
+        return (
             <div>
               <p>Name: {fileName}</p>
               <p>Size: {formatBytes(props.file.sizeInBytes)}</p>
@@ -153,7 +151,8 @@
       padding: 8px;
       display: flex;
       font-size: small;
-
+      gap: 10px;
+      cursor: pointer;
 
       .file-thumbnail {
         width: 60px;
