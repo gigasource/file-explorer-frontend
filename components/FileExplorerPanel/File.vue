@@ -151,6 +151,9 @@
 
     &--list {
       padding: 8px;
+      display: flex;
+      font-size: small;
+
 
       .file-thumbnail {
         width: 60px;
